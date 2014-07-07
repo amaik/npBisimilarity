@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.HashSet;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -14,7 +15,7 @@ public class Main {
 
 	/**
 	 * Demonstrates how to parse an LTS string.
-	 * Writes information about the LTS to standarf output.
+	 * Writes information about the LTS to standard output.
 	 */
 	public static void ltsParsingDemo() {
 		// we'll parse this string:
@@ -131,6 +132,68 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Parses a LTS Json String and generates a new LTS Class
+	 */
+	public static LTS parseAndGenerateLTS(String jsonLTS){
+		// LTS Constructor needs a Start state, and a set for each actions,transitions and States
+		HashSet<State> states = new HashSet<State>();
+		HashSet<Action> actions= new HashSet<Action>();
+		HashSet<Transition> transitions= new HashSet<Transition>();
+		State startState;
+		
+		//Create JSON Object
+		JsonObject ltsObject = Json.createReader(new StringReader(jsonLTS))
+				.readObject();
+		
+		//Get the Start state and Create Object, Put start state in the states Set
+		String initialStateLabel = ltsObject.getString("initialState");
+		startState = new State(initialStateLabel);
+		states.add(startState);
+		
+		/*
+		 * System.err.println("The initial state is \"" + initialStateLabel + "\".");
+		 * 
+		 */
+		
+		//Create new Object of JSON LTS States
+		JsonObject statesObject = ltsObject.getJsonObject("states");
+		
+		//Iterate through states and create new States
+		for (String state : statesObject.keySet()) {
+			
+			//Create new State from String and add to Set
+			State newState = new State(state);
+			states.add(newState);
+
+			JsonObject stateObject = statesObject.getJsonObject(state);
+
+			JsonArray transitionsArray = stateObject
+					.getJsonArray("transitions");
+
+			for (int i = 0; i < transitionsArray.size(); i++) {
+
+				JsonObject transition = transitionsArray.getJsonObject(i);
+
+				String actionLabel = transition.getString("label");
+				//Create new Action and add to action Set
+				Action newAction = new Action(actionLabel);
+				actions.add(newAction);
+				
+				//Create target State and add to states
+				String target = transition.getString("target");
+				State tarState = new State(target);
+				states.add(tarState);
+				
+				//Create new Transition from newState to 
+				Transition newTrans = new Transition(newState,tarState,newAction);
+				transitions.add(newTrans);
+			}
+
+		}		
+
+		return new LTS(startState, states, actions, transitions);
+	}
 	
 	/**
 	 * Reads the standard input.
@@ -159,6 +222,25 @@ public class Main {
 			
 			// read the input
 			String input = readStandardInput();
+			
+			/*
+			 * Parse the Input LTS and Generate the Class
+			 */
+			LTS lts = parseAndGenerateLTS(input);
+			
+			/*
+			 * Compute and get weakTransitions
+			 */
+			HashSet<Transition> weakTransitions = lts.getWeakTransitionRelation();
+			
+			/*
+			 * Minify LTS - has to be concurrent TODO
+			 */
+			
+			/*
+			 * Genrate new LTS in LTS-JSON-Format
+			 */
+			
 			
 			// TODO do the minimization
 			String output = input; // this may not write to standard output!
