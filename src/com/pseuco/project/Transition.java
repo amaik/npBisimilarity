@@ -29,5 +29,11 @@ public class Transition {
 		return transAction;
 	}
 	
+	public Boolean isWeak() {
+		if (this.transAction.getName()=="i")
+			return true;
+		return false;
+	}
+	
 
 }

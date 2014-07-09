@@ -58,17 +58,40 @@ public class LTS {
 	}
 
 	
+	public void addToWeakTrans(Transition trans){
+		this.weakTransitionRelation.add(trans);
+	}
+	
 	/*
 	 * Method to compute the weak TransitionRelation for the given LTS
 	 */
 	
 	public void generateWeakTransitionRelation(){
 		//TODO Max deine Arbeit ;)
+		
+		for (State i :this.states) {
+			i.accept(this, i, false, null);
+		}
+	}
+	
+	/*
+	 * Returns all transitions that start at the given state
+	 * */
+	public HashSet<Transition> getOutgoingTransitions(State status) {
+		HashSet<Transition> res = new HashSet<Transition>();
+		for (Transition tran : this.transitionRelation)
+		{
+			if(tran.getSrcState().equals(status)) //Start state of the transitions equals the given state
+					{
+						res.add(tran);
+					}
+		}
+		return res;
 	}
 	
 	public HashSet<Transition> getWeakTransitionRelation(){
 		if (this.weakTransitionRelation.isEmpty())
-			generateWeakTransitionRelation();
+			generateWeakTransitionRelation();  //warum nicht im konstruktor aufrufen?
 		return (HashSet<Transition>) this.weakTransitionRelation.clone();
 	}
 	
