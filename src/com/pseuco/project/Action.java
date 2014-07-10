@@ -18,4 +18,8 @@ public class Action {
 	public boolean equals(Action act){
 		return (this.name.equals(act.getName()));
 	}
+	
+	public String toString() {
+		return this.name;
+	}
 }

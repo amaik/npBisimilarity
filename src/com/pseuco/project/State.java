@@ -15,4 +15,8 @@ public class State {
 	public boolean equals(State state){
 		return (this.name.equals(state.getName()));
 	}
+	
+	public String toString() {
+		return this.name;
+	}
 }

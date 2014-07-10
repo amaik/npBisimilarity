@@ -35,6 +35,8 @@ public class LTS {
 		//Add transitions
 		this.transitionRelation = new HashSet<Transition>();
 		this.transitionRelation.addAll(transitions);
+	
+		generateWeakTransitionRelation();  //warum nicht im konstruktor aufrufen? Kann man machen
 		
 	}
 
@@ -97,8 +99,7 @@ public class LTS {
 	
 	@SuppressWarnings("unchecked")
 	public HashSet<Transition> getWeakTransitionRelation(){
-		if (this.weakTransitionRelation.isEmpty())
-			generateWeakTransitionRelation();  //warum nicht im konstruktor aufrufen? Kann man machen
+		
 		return (HashSet<Transition>) this.weakTransitionRelation.clone();
 	}
 	

@@ -41,5 +41,10 @@ public class Transition {
 				    && this.transAction.equals(trans.getTransAction()));
 	}
 	
+	public String toString() {
+		
+		return srcState.toString() + " -" + transAction.toString() + "-> " + tarState.toString();
+	}
+	
 
 }
