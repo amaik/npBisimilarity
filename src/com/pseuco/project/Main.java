@@ -3,7 +3,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -216,6 +218,7 @@ public class Main {
 	}
 	
 	
+	
 	public static void main(String[] args) throws IOException {
 		if (args.length == 1 && args[0].equals("-i")) {
 			// started with command line argument -i
@@ -231,8 +234,6 @@ public class Main {
 			/*
 			 * Compute and get weakTransitions
 			 */
-			HashSet<Transition> weakTransitions = lts.getWeakTransitionRelation();
-			
 			/*
 			 * Minify LTS - has to be concurrent TODO
 			 */
@@ -246,7 +247,49 @@ public class Main {
 			
 			// output the result on standard output
 			System.out.println(output);
-		} else {
+		}
+		else  if (args.length == 1 && args[0].equals("-wk")) {
+			// started with command line argument -i
+			
+			// read the input
+			String input = readStandardInput();
+			
+			/*
+			 * Parse the Input LTS and Generate the Class
+			 */
+			LTS lts = parseAndGenerateLTS(input);
+			
+			/*
+			 * Compute and get weakTransitions
+			 */
+			HashSet<Transition> weakTransitions = lts.getWeakTransitionRelation();
+			LinkedList<String> transList = new LinkedList<String>();
+			for (Transition trans : weakTransitions) {
+				 transList.add(trans.toString());
+			}
+			Collections.sort(transList);
+			
+			
+			System.out.println("weak Transitions: " + weakTransitions.size());
+			for (String trans : transList)
+			{
+				System.out.println(trans.toString());
+			}
+			/*
+			 * Minify LTS - has to be concurrent TODO
+			 */
+			
+			/*
+			 * Genrate new LTS in LTS-JSON-Format
+			 */
+			
+			
+			String output = input; // this may not write to standard output!
+			
+			// output the result on standard output
+			System.out.println(output);
+		} 
+		else {
 			// other command line arguments
 			
 			ltsParsingDemo();
