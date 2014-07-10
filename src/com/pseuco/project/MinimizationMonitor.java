@@ -1,8 +1,6 @@
 package com.pseuco.project;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.TreeSet;
 
 public class MinimizationMonitor {
 	
@@ -11,11 +9,13 @@ public class MinimizationMonitor {
 	 */
 	private static HashSet<Block> partition = new HashSet<Block>();
 	
-	private static HashSet<Block> toDoList = new HashSet<Block>();
+	private static HashSet<BlockTuple> toDoList = new HashSet<BlockTuple>();
 	
 	private static HashSet<Block> currentlyDoneList = new HashSet<Block>();
 	
 	private static HashSet<Transition> weakTransitionRelation;
+	
+	private static boolean workFinished = false;
 	
 	
 	/*
@@ -23,8 +23,9 @@ public class MinimizationMonitor {
 	 */
 	public MinimizationMonitor(HashSet<State> startPartition,HashSet<Transition> weakTransRel ){
 		Block startP = new Block(startPartition);
-		this.partition.add(startP);
-		this.weakTransitionRelation = weakTransRel;
+		partition.add(startP);
+		weakTransitionRelation = weakTransRel;
+		toDoList.add(new BlockTuple(startP, startP));
 	}
 	
 	public static HashSet<Transition> getWeakTransitionRelation() {
@@ -39,17 +40,80 @@ public class MinimizationMonitor {
 		return partition;
 	}
 	
+	synchronized static boolean getWorkFinished(){
+		return workFinished;
+	}
+	
 	/*
 	 * Locked Methods
 	 */
 	
-	synchronized static public BlockTuple getNextToDoAndStart(){
-		// berechnet welches TODO als nächstes berechnet werden kann und speichert die Beobachteten Blöcke in 
-		// der currentlyDoneLis
-		return null;
+	
+	/*
+	 *Computes the todo that another thread can compute the partition vor, returns null when no Todo is 
+	 *available. It also saves the computed Blocks inside.
+	 *Returns Null if no Block is available 
+	 */
+	synchronized  public BlockTuple getNextToDoAndStart() throws InterruptedException{
+
+		BlockTuple res = null;
+		if(toDoList.isEmpty())
+			wait();
+		if(workFinished)
+			//Bin mir hier nicht ganz sicher, eigentlich sollte nur die Methode verlassen werden
+			//und der Thread sollte weiterlaufen
+			Thread.currentThread().interrupt();
+		for(BlockTuple b : toDoList){
+			if(! ( currentlyDoneList.contains(b.getBlockOne())
+					|| currentlyDoneList.contains(b.getBlockTwo())))
+			res = b;		
+		}
+		currentlyDoneList.add(res.getBlockOne());
+		currentlyDoneList.add(res.getBlockTwo());
+		return res;
 	}
 	
-	synchronized static public void computeNewToDosAndEnd(){
-		//TODO berechnet die neuen TODO-Blöcke, die beim berechnen notwendig geworden sind. Entfernt Außerdem die 
+	/*
+	 * Computes the new blocks that are todo. It erases the blocks out of currentlyDoneList, that 
+	 * are not needed anymore.
+	 * newBlocks contains the new Blocks.
+	 * toDelete is the Block that has to be erased from currentlyDoneList
+	 * splitted is the Block that was splitted apart
+	 */
+	synchronized static public void computeNewToDosAndEnd(BlockTuple newBlocks,Block splitted,Block toDelete){
+		//FÃ¼ge zuerst in HashSet ein und vereinige died mit toDoList
+		//sonst iterator Ã¼berschreiben
+		HashSet<BlockTuple> toAdd = new HashSet<BlockTuple>();
+		HashSet<BlockTuple> toDel = new HashSet<BlockTuple>();
+		Block nOne = newBlocks.getBlockOne();
+		Block nTwo = newBlocks.getBlockTwo();
+		Block bOne;
+		Block bTwo;
+		boolean check1 = false,check2= false;
+		//Berechne neue todos und markiere welche zu lÃ¶schen sind
+		for(BlockTuple b : toDoList){
+			bOne = b.getBlockOne();
+			bTwo = b.getBlockTwo();
+			if(! bOne.equals(splitted)){
+				toAdd.add(new BlockTuple(nOne,bOne));
+				toAdd.add(new BlockTuple(nTwo,bOne));
+				check1 = true;
+			}
+			if(!bTwo.equals(splitted)){
+				toAdd.add(new BlockTuple(nOne,bTwo));
+				toAdd.add(new BlockTuple(nTwo,bTwo));
+				check2 = true;
+			}
+			if(check1 || check2)
+				toDel.add(b);
+			check1 = false; check2 = false;
+		}
+		//FÃ¼ge Hinzu/lÃ¶sche
+		toDoList.addAll(toAdd);
+		toDoList.removeAll(toDel);
+		
+		//Remove the Blocks from CurrentlyDone
+		currentlyDoneList.remove(splitted);
+		currentlyDoneList.remove(toDelete);
 	}
 }
