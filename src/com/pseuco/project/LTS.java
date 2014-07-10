@@ -67,21 +67,26 @@ public class LTS {
 	 */
 	
 	public void generateWeakTransitionRelation(){
-		//TODO Max deine Arbeit ;)
+		//Füge Transitionen zu sich selbst in Transitionsrelation ein
+		
+		Action τ = new Action("τ");
 		
 		for (State i :this.states) {
-			i.accept(this, i, false, null);
+			this.weakTransitionRelation.add(new Transition(i,i,τ));
+			this.generateWeakTransitionForState(i,i, false, null);
 		}
+	
 	}
+	
 	
 	/*
 	 * Returns all transitions that start at the given state
 	 * */
-	public HashSet<Transition> getOutgoingTransitions(State status) {
+	public HashSet<Transition> getOutgoingTransitions(State state) {
 		HashSet<Transition> res = new HashSet<Transition>();
 		for (Transition tran : this.transitionRelation)
 		{
-			if(tran.getSrcState().equals(status)) //Start state of the transitions equals the given state
+			if(tran.getSrcState().equals(state)) //Start state of the transitions equals the given state
 					{
 						res.add(tran);
 					}
@@ -89,11 +94,58 @@ public class LTS {
 		return res;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public HashSet<Transition> getWeakTransitionRelation(){
 		if (this.weakTransitionRelation.isEmpty())
-			generateWeakTransitionRelation();  //warum nicht im konstruktor aufrufen?
+			generateWeakTransitionRelation();  //warum nicht im konstruktor aufrufen? Kann man machen
 		return (HashSet<Transition>) this.weakTransitionRelation.clone();
 	}
 	
+	//Start is the state the Transitions are computed for
+	//current is the current State in the recursive descent
+	public void generateWeakTransitionForState(State start, State current, Boolean UsedStrong,
+			Action StrongAction) {
+
+		if (start == null) {
+			throw new NullPointerException("start == null");
+		}
+
+		for (Transition i : this.getOutgoingTransitions(current)) { //iteriere über ausgehende transitionen
+			State transTarget = i.getTarState(); //ziel der aktuellen transition
+			if (transTarget != current) { //keine transitionen zu mir selbst 
+				
+										/*Jeder zustand kann sich selbst aber schwach erreichen!*/
+				
+				if (i.isIntern()) { // man kommt zu dem Folgezustand über eine
+									// schwache  Aktion (Transition? Es gibt keine schwachen Aktionen)
+					if (UsedStrong) { // falls schon starke genutzt
+
+						Transition newTrans = new Transition(start,
+								transTarget, StrongAction);
+						this.addToWeakTrans(newTrans);
+						this.generateWeakTransitionForState( start,transTarget, UsedStrong, StrongAction);
+					} else if (!UsedStrong) { // falls noch keien starke genutzt
+						// erzeuge neue transition vom start zustand zum
+						// folgenden
+						Transition newTrans = new Transition(start,
+								transTarget, i.getTransAction());
+						this.addToWeakTrans(newTrans);
+						this.generateWeakTransitionForState(start, transTarget, UsedStrong, StrongAction);
+					}
+				} else { // starke Transition
+					if (!UsedStrong) { // nur falls noch keine starke genutzt
+										// wurde
+						// erzeuge neue transition vom start zustand zum
+						// folgenden
+						Transition newTrans = new Transition(start,
+								transTarget, i.getTransAction());
+						this.addToWeakTrans(newTrans);
+						this.generateWeakTransitionForState(start,transTarget, true, i.getTransAction());
+					}
+				}
+			}
+		}
+
+	}
 
 }

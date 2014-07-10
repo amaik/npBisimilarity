@@ -29,8 +29,8 @@ public class Transition {
 		return transAction;
 	}
 	
-	public Boolean isWeak() {
-		if (this.transAction.getName()=="i")
+	public Boolean isIntern() {
+		if (this.transAction.getName()=="τ")
 			return true;
 		return false;
 	}
