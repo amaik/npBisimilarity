@@ -73,7 +73,8 @@ public class LTS {
 		
 		for (State i :this.states) {
 			this.weakTransitionRelation.add(new Transition(i,i,τ));
-			this.generateWeakTransitionForState(i,i, false, null);
+			HashSet<State> alreadyVisited= new  HashSet<State>();
+			this.generateWeakTransitionForState(i,i, false, null, alreadyVisited);
 		}
 	
 	}
@@ -104,15 +105,17 @@ public class LTS {
 	//Start is the state the Transitions are computed for
 	//current is the current State in the recursive descent
 	public void generateWeakTransitionForState(State start, State current, Boolean UsedStrong,
-			Action StrongAction) {
+			Action StrongAction, HashSet<State> alreadyVisited) {
 
 		if (start == null) {
 			throw new NullPointerException("start == null");
 		}
+		
+		alreadyVisited.add(current);
 
 		for (Transition i : this.getOutgoingTransitions(current)) { //iteriere über ausgehende transitionen
 			State transTarget = i.getTarState(); //ziel der aktuellen transition
-			if (transTarget != current) { //keine transitionen zu mir selbst 
+			if (!alreadyVisited.contains(transTarget)) { //keine transitionen zu schon besuchten States
 				
 										/*Jeder zustand kann sich selbst aber schwach erreichen!*/
 				
@@ -123,14 +126,16 @@ public class LTS {
 						Transition newTrans = new Transition(start,
 								transTarget, StrongAction);
 						this.addToWeakTrans(newTrans);
-						this.generateWeakTransitionForState( start,transTarget, UsedStrong, StrongAction);
+						HashSet <State> newAlreadyVisited= new HashSet<State>(alreadyVisited); //neues HashSet falls Backtracking
+						this.generateWeakTransitionForState( start,transTarget, UsedStrong, StrongAction, newAlreadyVisited);
 					} else if (!UsedStrong) { // falls noch keien starke genutzt
 						// erzeuge neue transition vom start zustand zum
 						// folgenden
 						Transition newTrans = new Transition(start,
 								transTarget, i.getTransAction());
 						this.addToWeakTrans(newTrans);
-						this.generateWeakTransitionForState(start, transTarget, UsedStrong, StrongAction);
+						HashSet <State> newAlreadyVisited= new HashSet<State>(alreadyVisited);
+						this.generateWeakTransitionForState(start, transTarget, UsedStrong, StrongAction, newAlreadyVisited);
 					}
 				} else { // starke Transition
 					if (!UsedStrong) { // nur falls noch keine starke genutzt
@@ -140,7 +145,8 @@ public class LTS {
 						Transition newTrans = new Transition(start,
 								transTarget, i.getTransAction());
 						this.addToWeakTrans(newTrans);
-						this.generateWeakTransitionForState(start,transTarget, true, i.getTransAction());
+						HashSet <State> newAlreadyVisited= new HashSet<State>(alreadyVisited);
+						this.generateWeakTransitionForState(start,transTarget, true, i.getTransAction(), newAlreadyVisited);
 					}
 				}
 			}
