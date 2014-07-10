@@ -1,9 +1,5 @@
 package com.pseuco.project;
 
-import java.util.HashSet;
-
-import com.pseuco.project.Transition;
-
 public class State {
 
 	private final String name;
@@ -16,4 +12,7 @@ public class State {
 		return this.name;
 	}
 
+	public boolean equals(State state){
+		return (this.name.equals(state.getName()));
+	}
 }

@@ -15,4 +15,7 @@ public class Action {
 		return name;
 	}
 	
+	public boolean equals(Action act){
+		return (this.name.equals(act.getName()));
+	}
 }

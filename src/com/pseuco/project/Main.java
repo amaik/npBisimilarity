@@ -242,7 +242,6 @@ public class Main {
 			 */
 			
 			
-			// TODO do the minimization
 			String output = input; // this may not write to standard output!
 			
 			// output the result on standard output
