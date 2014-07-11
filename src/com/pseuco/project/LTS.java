@@ -154,5 +154,10 @@ public class LTS {
 		}
 
 	}
+	
+	public String genereateJSONLtsForm(){
+		//TODO wandle ein LTS in JSON form um
+		return "";
+	}
 
 }

@@ -291,10 +291,21 @@ public class Main {
 		} 
 		else {
 			// other command line arguments
-			
-			ltsParsingDemo();
-			openInBrowserDemo(ltsSerializationDemo());
+			System.err.println("No valid Arguments submitted, sorry! Shutting Down");
 		}		
+	}
+	
+	public static void minifyLTS(){
+		//TODO starte Threads und kooridiniere die Minmierung
+	}
+	
+	public static void run(){
+		//TODO run der Threads
+	}
+	
+	public static LTS  generateBeobachtungskongruentesLTS(LTS pre, LTS minified){
+		//TODO erstellen mithilfe des minifizierten LTS ein boebachtungskongruentes LTS 
+		return null;
 	}
 
 }
