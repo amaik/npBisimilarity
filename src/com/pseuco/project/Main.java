@@ -252,7 +252,6 @@ public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length == 1 && args[0].equals("-i")) {
 			// started with command line argument -i
-
 			// read the input
 			String input = readStandardInput();
 
@@ -272,10 +271,8 @@ public class Main {
 			String minJSON = minimised.genereateJSONLtsForm();
 			System.out.print(minJSON);
 
-			String output = input; // this may not write to standard output!
-
 			// output the result on standard output
-			System.out.println(output);
+			//System.out.println(output);
 		} else if (args.length == 1 && args[0].equals("-wk")) {
 			// started with command line argument -i
 

@@ -183,14 +183,12 @@ public class LTS {
 		
 		JsonObjectBuilder statesObjectBuilder = Json.createObjectBuilder();
 		for(State s : this.states){
-			if(!s.equals(this.startState)){
 				JsonArrayBuilder transitions = Json.createArrayBuilder();
 				for(Transition t : this.transitionRelation){
 					if(t.getSrcState().equals(s))
 					transitions.add(Json.createObjectBuilder().add("label",t.getTransAction().toString()).add("detailsLabel",false).add("target", t.getTarState().toString()).build());
 				}
 				statesObjectBuilder.add(s.toString(), Json.createObjectBuilder().add("transitions",transitions.build()).build());	
-			}
 		}
 		JsonObject statesObject = statesObjectBuilder.build();
 		
