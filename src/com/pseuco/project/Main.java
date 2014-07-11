@@ -271,8 +271,6 @@ public class Main {
 			String minJSON = minified.genereateJSONLtsForm();
 			System.out.print(minJSON);
 
-			// output the result on standard output
-			//System.out.println(output);
 		} else if (args.length == 1 && args[0].equals("-wk")) {
 			// started with command line argument -i
 
@@ -298,18 +296,7 @@ public class Main {
 			for (String trans : transList) {
 				System.out.println(trans.toString());
 			}
-			/*
-			 * Minify LTS - has to be concurrent TODO
-			 */
-
-			/*
-			 * Genrate new LTS in LTS-JSON-Format
-			 */
-
-			String output = input; // this may not write to standard output!
-
-			// output the result on standard output
-			System.out.println(output);
+		
 		} else {
 			// other command line arguments
 			System.err
