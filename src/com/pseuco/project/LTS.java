@@ -4,13 +4,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 public class LTS {
 
 	private final State startState;
 
-	private final HashSet<State> states;
+	private final HashSet<State> states = new HashSet<State>();
 
 	private final HashSet<Action> actions;
 
@@ -26,7 +28,6 @@ public class LTS {
 			Set<Transition> transitions) {
 		// Add startState and states
 		this.startState = startState;
-		this.states = new HashSet<State>();
 		this.states.add(startState);
 		this.states.addAll(states);
 
@@ -180,8 +181,23 @@ public class LTS {
 	public String genereateJSONLtsForm(){
 		String result = new String();
 		
-		JsonObject statesObjects = (JsonObject) Json.createObjectBuilder();
-		return "";
+		JsonObjectBuilder statesObjectBuilder = Json.createObjectBuilder();
+		for(State s : this.states){
+			if(!s.equals(this.startState)){
+				JsonArrayBuilder transitions = Json.createArrayBuilder();
+				for(Transition t : this.transitionRelation){
+					if(t.getSrcState().equals(s))
+					transitions.add(Json.createObjectBuilder().add("label",t.getTransAction().toString()).add("detailsLabel",false).add("target", t.getTarState().toString()).build());
+				}
+				statesObjectBuilder.add(s.toString(), Json.createObjectBuilder().add("transitions",transitions.build()).build());	
+			}
+		}
+		JsonObject statesObject = statesObjectBuilder.build();
+		
+		JsonObject ltsObject = Json.createObjectBuilder()
+				.add("initialState", this.startState.toString())
+				.add("states", statesObject)
+				.build();
+		return ltsObject.toString();
 	}
-
 }
