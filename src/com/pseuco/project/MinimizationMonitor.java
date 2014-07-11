@@ -47,9 +47,17 @@ public class MinimizationMonitor {
 	 * Unlocked Methodds
 	 */
 	//returns the predecessors for all states in the given block b with action alpha
-	public static HashSet<State> pre(Block b, Action alpha){
+	public static  HashSet<State> pre(Block b, Action alpha){
 		HashSet<State> res = new HashSet<State>();
-		return null;
+		for (State state : b.getStates()) {
+			for (Transition trans : MinimizationMonitor.weakTransitionRelation)	{
+				if (trans.getTarState().equals(state) && trans.getTransAction().equals(alpha))	{ //target state and action equal
+					res.add(trans.getSrcState()); //=> add the start-state to res
+				}
+			}
+		}
+		
+		return res;
 	}
 	
 	//returns all actions for the given weakTransitionRelation
