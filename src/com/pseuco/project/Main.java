@@ -260,15 +260,15 @@ public class Main {
 			 */
 			LTS lts = parseAndGenerateLTS(input);
 
-			LTS minimised = minifyLTS(lts);
+			
 			/* Minify LTS - has to be concurrent TODO
 			 */
-
+			LTS minified = minifyLTS(lts);
 			/*
 			 * Genrate new LTS in LTS-JSON-Format
 			 */
 			
-			String minJSON = minimised.genereateJSONLtsForm();
+			String minJSON = minified.genereateJSONLtsForm();
 			System.out.print(minJSON);
 
 			// output the result on standard output
@@ -342,9 +342,24 @@ public class Main {
 
 	// creates a new beobachtungskongruentes lts to the given lts
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
-		//HashSet<Block> Partition = minifyPartition(lts);
-
+		HashSet<Block> partition = minifyPartition(lts);
+		State newStart = new State("1");
+		State oldStart = lts.getStartState();
+		Block blockWithStartState = getBlockThatContains(oldStart,partition);
+		
+		
+		
 		return lts;
 	}
-
+	/*
+	 * Returns the Block which contains the state
+	 * Returns null if no Block contains the state
+	 */
+	public static Block getBlockThatContains(State s,HashSet<Block> partition){
+		for(Block b : partition)
+			for(State st : b.getStates())
+				if(st.equals(s))
+					return b;
+		return null;
+	}
 }
