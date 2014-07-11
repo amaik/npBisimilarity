@@ -7,15 +7,15 @@ public class MinimizationMonitor {
 	/*
 	 * Fields
 	 */
-	private static HashSet<Block> partition = new HashSet<Block>();
+	private  HashSet<Block> partition = new HashSet<Block>();
 	
-	private static HashSet<BlockTuple> toDoList = new HashSet<BlockTuple>();
+	private  HashSet<BlockTuple> toDoList = new HashSet<BlockTuple>();
 	
-	private static HashSet<Block> currentlyDoneList = new HashSet<Block>();
+	private  HashSet<Block> currentlyDoneList = new HashSet<Block>();
 	
-	private static HashSet<Transition> weakTransitionRelation;
+	private  HashSet<Transition> weakTransitionRelation;
 	
-	private static boolean workFinished = false;
+	private  boolean workFinished = false;
 	
 	
 	/*
@@ -28,7 +28,7 @@ public class MinimizationMonitor {
 		toDoList.add(new BlockTuple(startP, startP));
 	}
 	
-	public static HashSet<Transition> getWeakTransitionRelation() {
+	public  HashSet<Transition> getWeakTransitionRelation() {
 		return weakTransitionRelation;
 	}
 	
@@ -36,21 +36,21 @@ public class MinimizationMonitor {
 	/*
 	 * Getter and Setter
 	 */
-	synchronized static public HashSet<Block> getPartition(){
+	synchronized  public HashSet<Block> getPartition(){
 		return partition;
 	}
 	
-	synchronized static boolean getWorkFinished(){
+	synchronized  boolean getWorkFinished(){
 		return workFinished;
 	}
 	/*
 	 * Unlocked Methodds
 	 */
 	//returns the predecessors for all states in the given block b with action alpha
-	public static  HashSet<State> pre(Block b, Action alpha){
+	public   HashSet<State> pre(Block b, Action alpha){
 		HashSet<State> res = new HashSet<State>();
 		for (State state : b.getStates()) {
-			for (Transition trans : MinimizationMonitor.weakTransitionRelation)	{
+			for (Transition trans : this.weakTransitionRelation)	{
 				if (trans.getTarState().equals(state) && trans.getTransAction().equals(alpha))	{ //target state and action equal
 					res.add(trans.getSrcState()); //=> add the start-state to res
 				}
@@ -61,19 +61,27 @@ public class MinimizationMonitor {
 	}
 	
 	//returns all actions for the given weakTransitionRelation
-	public static HashSet<Action> giveActions(){
+	public  HashSet<Action> giveActions(){
 		HashSet<Action> acts = new HashSet<Action>();
-		for(Transition t : weakTransitionRelation)
+		for(Transition t : this.weakTransitionRelation)
 			acts.add(t.getTransAction());
+		return acts;
 	}
 	/*
 	 * Create Runnable
 	 */
-	static  Runnable runner = new Runnable() {
+	public  Runnable runner = new Runnable() {
 		public void run() {
-			BlockTuple next = this.getNextToDoAndStart();
-			Block one = next.getBlockOne();
-			Block two = next.getBlockTwo();
+			BlockTuple next = null;
+			try {
+				next = getNextToDoAndStart();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if(next != null){
+				Block one = next.getBlockOne();
+				Block two = next.getBlockTwo();
+			}
 			HashSet<Action> acts = giveActions();
 			
 			
@@ -117,7 +125,7 @@ public class MinimizationMonitor {
 	 * toDelete is the Block that has to be erased from currentlyDoneList
 	 * splitted is the Block that was splitted apart
 	 */
-	synchronized static public void computeNewToDosAndEnd(BlockTuple newBlocks,Block splitted,Block toDelete){
+	synchronized  public void computeNewToDosAndEnd(BlockTuple newBlocks,Block splitted,Block toDelete){
 		//Füge zuerst in HashSet ein und vereinige died mit toDoList
 		//sonst iterator überschreiben
 		HashSet<BlockTuple> toAdd = new HashSet<BlockTuple>();
