@@ -50,18 +50,17 @@ public class MinimizationMonitor {
 	
 	
 	/*
-	 *Computes the todo that another thread can compute the partition vor, returns null when no Todo is 
+	 *Computes the todo that another thread can compute the partition for, returns null when no Todo is 
 	 *available. It also saves the computed Blocks inside.
 	 *Returns Null if no Block is available 
 	 */
-	synchronized  public BlockTuple getNextToDoAndStart() throws InterruptedException{
+	synchronized public BlockTuple getNextToDoAndStart() throws InterruptedException{
 
 		BlockTuple res = null;
 		if(toDoList.isEmpty())
 			wait();
 		if(workFinished)
-			//Bin mir hier nicht ganz sicher, eigentlich sollte nur die Methode verlassen werden
-			//und der Thread sollte weiterlaufen
+			//Schalte Thread aus, arbeit ist vorbei;
 			Thread.currentThread().interrupt();
 		for(BlockTuple b : toDoList){
 			if(! ( currentlyDoneList.contains(b.getBlockOne())
@@ -115,5 +114,9 @@ public class MinimizationMonitor {
 		//Remove the Blocks from CurrentlyDone
 		currentlyDoneList.remove(splitted);
 		currentlyDoneList.remove(toDelete);
+		
+		//workFinished muss gesetzt werden
+		if(toDoList.isEmpty() && currentlyDoneList.isEmpty())
+			workFinished = true;
 	}
 }
