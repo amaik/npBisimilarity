@@ -45,6 +45,22 @@ public class MinimizationMonitor {
 	}
 	
 	/*
+	 * Create Runnable
+	 */
+	static  Runnable runner = new Runnable() {
+		public void run() {
+			BlockTuple next = this.getNextToDoAndStart();
+			Block one = next.getBlockOne();
+			Block two = next.getBlockTwo();
+			
+			
+			
+		}
+	};
+	
+	
+	
+	/*
 	 * Locked Methods
 	 */
 	

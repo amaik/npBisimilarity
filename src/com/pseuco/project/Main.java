@@ -300,12 +300,6 @@ public class Main {
 	}
 	
 	
-	static  Runnable runner = new Runnable() {
-		public void run() {
-			//TODO run der Threads
-		}
-	};
-	
 	
 	public static LTS  generateBeobachtungskongruentesLTS(LTS pre, LTS minified){
 		//TODO erstellen mithilfe des minifizierten LTS ein boebachtungskongruentes LTS 
