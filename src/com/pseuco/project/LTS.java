@@ -3,6 +3,9 @@ package com.pseuco.project;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+
 public class LTS {
 
 	private final State startState;
@@ -175,7 +178,9 @@ public class LTS {
 	}
 	
 	public String genereateJSONLtsForm(){
-		//TODO wandle ein LTS in JSON form um
+		String result = new String();
+		
+		JsonObject statesObjects = (JsonObject) Json.createObjectBuilder();
 		return "";
 	}
 
