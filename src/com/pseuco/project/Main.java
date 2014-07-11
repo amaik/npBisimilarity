@@ -295,8 +295,12 @@ public class Main {
 		}		
 	}
 	
-	public static void minifyLTS(){
+	public static void minifyLTS(LTS lts){
 		//TODO starte Threads und kooridiniere die Minmierung
+		new MinimizationMonitor(lts.getStates(), lts.getWeakTransitionRelation());
+		int avProc = Runtime.getRuntime().availableProcessors();
+		
+		
 	}
 	
 	

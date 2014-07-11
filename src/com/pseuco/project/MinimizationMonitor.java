@@ -44,6 +44,12 @@ public class MinimizationMonitor {
 		return workFinished;
 	}
 	
+	
+	public HashSet<State> pre(Block b){
+		return null;
+		
+	}
+	
 	/*
 	 * Create Runnable
 	 */
