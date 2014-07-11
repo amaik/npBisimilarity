@@ -72,19 +72,57 @@ public class MinimizationMonitor {
 	 */
 	public  Runnable runner = new Runnable() {
 		public void run() {
-			BlockTuple next = null;
-			try {
-				next = getNextToDoAndStart();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			//Arbeite solange es arbeit gibt
+			while(!workFinished){
+				//Hohle die nächste toDos
+				BlockTuple next = null;
+				try {
+					next = getNextToDoAndStart();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				Block one;
+				Block two;
+				if(next != null){
+					one = next.getBlockOne();
+					two = next.getBlockTwo();
+				}
+				else return;
+				//Prüfe die Zerlegungseigenschaften in beide Richtungen
+				
+				HashSet<Action> acts = giveActions();
+				HashSet<State> stateIntersection,stateComplement;
+				for(Action a : acts){
+					//Richtung 1
+					
+					//Diese Reihenfolge ist so wichtig, da stateIntersection 
+					//zu beginn = pre(one, a) und pre(one,a) gebraucht wird um 
+					//stateComplement zu bilden
+					stateIntersection = pre(two,a);
+					stateComplement = one.getStates();
+					stateComplement.removeAll(stateIntersection);
+					stateIntersection.retainAll(one.getStates());
+					if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
+						Block newBlockOne = new Block(stateIntersection);
+						Block newBlockTwo = new Block(stateComplement);
+						BlockTuple newBlocks = new BlockTuple(newBlockOne,newBlockTwo);
+						computeNewToDosAndEnd(newBlocks, one, two);
+					}
+					
+					//Richtung 2
+					
+					stateIntersection = pre(one,a);
+					stateComplement = two.getStates();
+					stateComplement.removeAll(stateIntersection);
+					stateIntersection.retainAll(two.getStates());
+					if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
+						Block newBlockOne = new Block(stateIntersection);
+						Block newBlockTwo = new Block(stateComplement);
+						BlockTuple newBlocks = new BlockTuple(newBlockOne,newBlockTwo);
+						computeNewToDosAndEnd(newBlocks, two, one);
+					}
+				}
 			}
-			if(next != null){
-				Block one = next.getBlockOne();
-				Block two = next.getBlockTwo();
-			}
-			HashSet<Action> acts = giveActions();
-			
-			
 		}
 	};
 	
