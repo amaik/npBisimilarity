@@ -43,13 +43,21 @@ public class MinimizationMonitor {
 	synchronized static boolean getWorkFinished(){
 		return workFinished;
 	}
-	
+	/*
+	 * Unlocked Methodds
+	 */
 	//returns the predecessors for all states in the given block b with action alpha
-	public HashSet<State> pre(Block b, Action alpha){
+	public static HashSet<State> pre(Block b, Action alpha){
 		HashSet<State> res = new HashSet<State>();
 		return null;
 	}
 	
+	//returns all actions for the given weakTransitionRelation
+	public static HashSet<Action> giveActions(){
+		HashSet<Action> acts = new HashSet<Action>();
+		for(Transition t : weakTransitionRelation)
+			acts.add(t.getTransAction());
+	}
 	/*
 	 * Create Runnable
 	 */
@@ -58,7 +66,7 @@ public class MinimizationMonitor {
 			BlockTuple next = this.getNextToDoAndStart();
 			Block one = next.getBlockOne();
 			Block two = next.getBlockTwo();
-			
+			HashSet<Action> acts = giveActions();
 			
 			
 		}
