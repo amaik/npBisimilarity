@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -249,7 +250,8 @@ public class Main {
 		return builder.toString();
 	}
 
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException,
+			InterruptedException {
 		if (args.length == 1 && args[0].equals("-i")) {
 			// started with command line argument -i
 			// read the input
@@ -260,14 +262,14 @@ public class Main {
 			 */
 			LTS lts = parseAndGenerateLTS(input);
 
-			
-			/* Minify LTS - has to be concurrent TODO
+			/*
+			 * Minify LTS - has to be concurrent TODO
 			 */
 			LTS minified = minifyLTS(lts);
 			/*
 			 * Genrate new LTS in LTS-JSON-Format
 			 */
-			
+
 			String minJSON = minified.genereateJSONLtsForm();
 			System.out.print(minJSON);
 
@@ -296,7 +298,7 @@ public class Main {
 			for (String trans : transList) {
 				System.out.println(trans.toString());
 			}
-		
+
 		} else {
 			// other command line arguments
 			System.err
@@ -330,23 +332,93 @@ public class Main {
 	// creates a new beobachtungskongruentes lts to the given lts
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
 		HashSet<Block> partition = minifyPartition(lts);
-		State newStart = new State("1");
-		State oldStart = lts.getStartState();
-		Block blockWithStartState = getBlockThatContains(oldStart,partition);
-		
-		
-		
-		return lts;
+		HashMap<State,Block> StateToBlock = new HashMap<State,Block>(); //Maps a state in the old lts to its containing block
+		HashMap<Block, State> BlockToState = new HashMap<Block,State>(); //maps a block to a state in the new lts
+		HashSet<State> newStates = new HashSet<State>();
+		int i=0;
+		 for (Block block : partition) { 
+			 for (State stat : block.getStates()) {
+				 StateToBlock.put(stat, block);
+			 }
+			 State newState= new State(Integer.toString(i));
+			 newStates.add(newState);
+			 BlockToState.put(block, newState);	 
+		 } 
+		 HashSet<State> reachedStates = new HashSet<State>(); 
+		 HashSet<Transition> newTransitions= new HashSet<Transition>();
+ 
+		 State oldStart = lts.getStartState();
+		 State newStart = getMatchingState(oldStart, StateToBlock, BlockToState);
+		 reachedStates.add(newStart);
+		 
+		 createTransitions(oldStart, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, true);
+		 
+		 for (Block block : partition) { //start createtransitions once for a state out of every block
+			 State state=null;
+			 for (State stateGetter : block.getStates()) {//alter wie hässlich fuck u java
+				 state=stateGetter; //hoffen ma ma es gibt keene leere states
+				 break;	 
+			 }
+			 createTransitions(state, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, false);
+		 } 
+		 
+ 		 LTS newLts = new LTS(newStart, reachedStates, newTransitions);
+		return newLts;
 	}
-	/*
-	 * Returns the Block which contains the state
-	 * Returns null if no Block contains the state
-	 */
-	public static Block getBlockThatContains(State s,HashSet<Block> partition){
-		for(Block b : partition)
-			for(State st : b.getStates())
-				if(st.equals(s))
-					return b;
-		return null;
+	
+	
+	//returns all outgoing transitions from the given state 
+	public static HashSet<Transition> getOutgoingTransition(State state, HashSet<Transition> weakTrans) {
+			HashSet<Transition> res = new HashSet<Transition>();
+			for (Transition trans: weakTrans) {
+				if(trans.getSrcState().equals(state))
+					res.add(trans);
+			}
+			return res;
+			
 	}
+	
+	//returns the matching state in the new lts , based on the given state in the old lts
+	public static State getMatchingState(State oldState ,HashMap<State,Block> StateToBlock, HashMap<Block, State> BlockToState) {
+		Block containingBlock = StateToBlock.get(oldState);
+		return BlockToState.get(containingBlock);
+	}
+	
+		
+	
+	//creates outgoing transitions from the given state into the newTransitions hashSet
+	public static void createTransitions(State currrentState, HashSet<State> reachedStates, HashSet<Transition> newTransitions, 
+			HashSet<Transition> weakTransitions, HashMap<State,Block> StateToBlock, HashMap<Block, State> BlockToState, Boolean startState) {
+			
+			HashSet<Transition> outgoing = getOutgoingTransition(currrentState, weakTransitions);
+			State newSrcState = getMatchingState(currrentState, StateToBlock, BlockToState);
+			Block newSrcBlock = StateToBlock.get(currrentState);
+			for (Transition trans : outgoing) {
+				Block newTarBlock = StateToBlock.get(trans.getTarState());
+				if (newSrcBlock.equals(newTarBlock)) { //falls Start und Zielzustand im gleichen Block leigen
+					if (trans.isIntern())  { //is the transition uses and internal action 
+						if (startState) { //only draw an internal action from block->equal block if it is outgoing from the first state
+							State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
+							Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
+							newTransitions.add(newTrans);
+							//reachedStates.add(newTarState); first state is always reachable		
+						}
+					}
+					else { //always create external transitions
+						State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
+						Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
+						newTransitions.add(newTrans);
+						reachedStates.add(newTarState);
+					}
+				}
+				else { //falls verschiedene Blöcke muss ich Aktion auf jeden Fall bauen 
+					State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
+					Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
+					newTransitions.add(newTrans);
+					reachedStates.add(newTarState);					
+				}
+			}
+	}
+
+	
 }

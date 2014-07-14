@@ -3,6 +3,7 @@ package com.pseuco.project;
 public class State {
 
 	private final String name;
+	private Block containingBlock;
 
 	public State(String name) {
 		this.name = name;
@@ -45,6 +46,14 @@ public class State {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public Block getContainingBlock() {
+		return containingBlock;
+	}
+
+	public void setContainingBlock(Block containingBlock) {
+		this.containingBlock = containingBlock;
 	}
 	
 	
