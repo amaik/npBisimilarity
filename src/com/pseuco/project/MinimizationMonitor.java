@@ -150,7 +150,7 @@ public class MinimizationMonitor {
 	synchronized public BlockTuple getNextToDoAndStart() throws InterruptedException{
 
 		BlockTuple res = null;
-		if(toDoList.isEmpty())
+		while(toDoList.isEmpty())
 			wait();
 		if(workFinished)
 			//Schalte Thread aus, arbeit ist vorbei;
@@ -188,6 +188,7 @@ public class MinimizationMonitor {
 		//mehr in der toDoList ist
 		toAdd.add(new BlockTuple(nOne,toDelete));
 		toAdd.add(new BlockTuple(nTwo,toDelete));
+		toAdd.add(new BlockTuple(nOne,nTwo));
 		Block bOne;
 		Block bTwo;
 		boolean check1 = false,check2= false;
@@ -195,12 +196,12 @@ public class MinimizationMonitor {
 		for(BlockTuple b : toDoList){
 			bOne = b.getBlockOne();
 			bTwo = b.getBlockTwo();
-			if(bOne.equals(splitted)){
+			if(!bOne.equals(splitted)){
 				toAdd.add(new BlockTuple(nOne,bOne));
 				toAdd.add(new BlockTuple(nTwo,bOne));
 				check1 = true;
 			}
-			if(bTwo.equals(splitted)){
+			if(!bTwo.equals(splitted)){
 				toAdd.add(new BlockTuple(nOne,bTwo));
 				toAdd.add(new BlockTuple(nTwo,bTwo));
 				check2 = true;
