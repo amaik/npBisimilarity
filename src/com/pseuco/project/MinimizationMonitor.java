@@ -160,6 +160,8 @@ public class MinimizationMonitor {
 			Thread.currentThread().interrupt();
 		//
 		while(res == null){
+			if(workFinished)
+				Thread.currentThread().interrupt();
 			for(BlockTuple b : toDoList){
 				if(! ( currentlyDoneList.contains(b.getBlockOne())
 						|| currentlyDoneList.contains(b.getBlockTwo()))){
@@ -241,5 +243,8 @@ public class MinimizationMonitor {
 	synchronized public void takeOutOfCurrentlyDoneList(Block one, Block two){
 		currentlyDoneList.remove(one);
 		currentlyDoneList.remove(two);
+		if(toDoList.isEmpty() && currentlyDoneList.isEmpty())
+			workFinished = true;
+		notifyAll();
 	}
 }
