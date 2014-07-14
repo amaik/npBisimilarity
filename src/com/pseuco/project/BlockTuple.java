@@ -56,5 +56,15 @@ public class BlockTuple {
 			return false;
 		return true;
 	}
+	
+	@Override 
+	public String toString() {
+		String res="1. Block:";
+		
+		res += this.blockOne.toString() + "\n ";
+		res += "2. Block:";
+		res += this.blockTwo.toString() + "\n ";
+		return res;
+	}
 
 }

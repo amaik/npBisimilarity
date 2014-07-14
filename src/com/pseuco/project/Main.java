@@ -265,6 +265,7 @@ public class Main {
 			/*
 			 * Minify LTS - has to be concurrent TODO
 			 */
+			
 			LTS minified = minifyLTS(lts);
 			/*
 			 * Genrate new LTS in LTS-JSON-Format
@@ -332,7 +333,9 @@ public class Main {
 
 	// creates a new beobachtungskongruentes lts to the given lts
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
+		System.out.println("alex hat scheisse gebaut");
 		HashSet<Block> partition = minifyPartition(lts);
+		System.out.println("max hat scheisse gebaut	");
 		HashMap<State,Block> StateToBlock = new HashMap<State,Block>(); //Maps a state in the old lts to its containing block
 		HashMap<Block, State> BlockToState = new HashMap<Block,State>(); //maps a block to a state in the new lts
 		HashSet<State> newStates = new HashSet<State>();

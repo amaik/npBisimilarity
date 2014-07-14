@@ -42,4 +42,16 @@ public class Block {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		String res="[";
+		for (State state : this.getStates()) {
+			res += "{" + state.toString() + " }";
+		}
+		res += "]";
+		return res;
+	}
 }
+
+
