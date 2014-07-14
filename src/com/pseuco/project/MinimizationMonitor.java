@@ -81,46 +81,54 @@ public class MinimizationMonitor {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				Block one;
-				Block two;
-				if(next != null){
-					one = next.getBlockOne();
-					two = next.getBlockTwo();
-				}
-				else return;
-				//Prüfe die Zerlegungseigenschaften in beide Richtungen
+				synchronized(next){
+					Block one;
+					Block two;
+					if(next != null){
+						one = next.getBlockOne();
+						two = next.getBlockTwo();
+					}
+					else return;
+					//Prüfe die Zerlegungseigenschaften in beide Richtungen
 				
-				HashSet<Action> acts = giveActions();
-				HashSet<State> stateIntersection,stateComplement;
-				for(Action a : acts){
-					//Richtung 1
+					HashSet<Action> acts = giveActions();
+					HashSet<State> stateIntersection,stateComplement;
+					boolean success = false;
+					for(Action a : acts){
+						//Richtung 1
 					
-					//Diese Reihenfolge ist so wichtig, da stateIntersection 
-					//zu beginn = pre(one, a) und pre(one,a) gebraucht wird um 
-					//stateComplement zu bilden
-					stateIntersection = pre(two,a);
-					stateComplement = one.getStates();
-					stateComplement.removeAll(stateIntersection);
-					stateIntersection.retainAll(one.getStates());
-					if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
-						Block newBlockOne = new Block(stateIntersection);
-						Block newBlockTwo = new Block(stateComplement);
-						BlockTuple newBlocks = new BlockTuple(newBlockOne,newBlockTwo);
-						computeNewToDosAndEnd(newBlocks, one, two);
+						//Diese Reihenfolge ist so wichtig, da stateIntersection 
+						//zu beginn = pre(one, a) und pre(one,a) gebraucht wird um 
+						//stateComplement zu bilden
+						stateIntersection = pre(two,a);
+						stateComplement = one.getStates();
+						stateComplement.removeAll(stateIntersection);
+						stateIntersection.retainAll(one.getStates());
+						if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
+							Block newBlockOne = new Block(stateIntersection);
+							Block newBlockTwo = new Block(stateComplement);
+							BlockTuple newBlocks = new BlockTuple(newBlockOne,newBlockTwo);
+							computeNewToDosAndEnd(newBlocks, one, two);
+							success = true;
+							break;
+						}
+					
+						//Richtung 2
+					
+						stateIntersection = pre(one,a);
+						stateComplement = two.getStates();
+						stateComplement.removeAll(stateIntersection);
+						stateIntersection.retainAll(two.getStates());
+						if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
+							Block newBlockOne = new Block(stateIntersection);
+							Block newBlockTwo = new Block(stateComplement);
+							BlockTuple newBlocks = new BlockTuple(newBlockOne,newBlockTwo);
+							computeNewToDosAndEnd(newBlocks, two, one);
+							success = true;
+							break;
+						}
 					}
-					
-					//Richtung 2
-					
-					stateIntersection = pre(one,a);
-					stateComplement = two.getStates();
-					stateComplement.removeAll(stateIntersection);
-					stateIntersection.retainAll(two.getStates());
-					if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
-						Block newBlockOne = new Block(stateIntersection);
-						Block newBlockTwo = new Block(stateComplement);
-						BlockTuple newBlocks = new BlockTuple(newBlockOne,newBlockTwo);
-						computeNewToDosAndEnd(newBlocks, two, one);
-					}
+					takeOutOfCurrentlyDoneList(one, two);
 				}
 			}
 		}
@@ -146,11 +154,16 @@ public class MinimizationMonitor {
 		if(workFinished)
 			//Schalte Thread aus, arbeit ist vorbei;
 			Thread.currentThread().interrupt();
+		//
 		for(BlockTuple b : toDoList){
 			if(! ( currentlyDoneList.contains(b.getBlockOne())
-					|| currentlyDoneList.contains(b.getBlockTwo())))
-			res = b;		
+					|| currentlyDoneList.contains(b.getBlockTwo()))){
+				res = b;
+				break;
+			}
+					
 		}
+		toDoList.remove(res);
 		currentlyDoneList.add(res.getBlockOne());
 		currentlyDoneList.add(res.getBlockTwo());
 		return res;
@@ -170,6 +183,10 @@ public class MinimizationMonitor {
 		HashSet<BlockTuple> toDel = new HashSet<BlockTuple>();
 		Block nOne = newBlocks.getBlockOne();
 		Block nTwo = newBlocks.getBlockTwo();
+		//Füge zu toAdd die neun BlockTuple hinzu, diemit toDelete entstehe, da toDelete eventuell nicht 
+		//mehr in der toDoList ist
+		toAdd.add(new BlockTuple(nOne,toDelete));
+		toAdd.add(new BlockTuple(nTwo,toDelete));
 		Block bOne;
 		Block bTwo;
 		boolean check1 = false,check2= false;
@@ -177,12 +194,12 @@ public class MinimizationMonitor {
 		for(BlockTuple b : toDoList){
 			bOne = b.getBlockOne();
 			bTwo = b.getBlockTwo();
-			if(! bOne.equals(splitted)){
+			if(bOne.equals(splitted)){
 				toAdd.add(new BlockTuple(nOne,bOne));
 				toAdd.add(new BlockTuple(nTwo,bOne));
 				check1 = true;
 			}
-			if(!bTwo.equals(splitted)){
+			if(bTwo.equals(splitted)){
 				toAdd.add(new BlockTuple(nOne,bTwo));
 				toAdd.add(new BlockTuple(nTwo,bTwo));
 				check2 = true;
@@ -190,6 +207,12 @@ public class MinimizationMonitor {
 			if(check1 || check2)
 				toDel.add(b);
 			check1 = false; check2 = false;
+		}
+		//Es kann sein dass verschiedene Blöcke nicht in der ToDo List stehen aber 
+		// trotzdem neue toDos damit berechnet werden müssen
+		for(Block b : currentlyDoneList){
+			toAdd.add(new BlockTuple(nOne,b));
+			toAdd.add(new BlockTuple(nTwo,b));
 		}
 		//Füge Hinzu/lösche
 		toDoList.addAll(toAdd);
@@ -199,8 +222,23 @@ public class MinimizationMonitor {
 		currentlyDoneList.remove(splitted);
 		currentlyDoneList.remove(toDelete);
 		
+		//Füge die neuen Blöcke in die Partition ein
+		partition.remove(splitted);
+		partition.add(nOne);
+		partition.add(nTwo);
+		
 		//workFinished muss gesetzt werden
 		if(toDoList.isEmpty() && currentlyDoneList.isEmpty())
 			workFinished = true;
+		
+		//Sage bescheid dass es neue ToDoS gibt
+		notifyAll();
+	}
+	/*
+	 * This method is used when no block could be splitted
+	 */
+	synchronized public void takeOutOfCurrentlyDoneList(Block one, Block two){
+		currentlyDoneList.remove(one);
+		currentlyDoneList.remove(two);
 	}
 }

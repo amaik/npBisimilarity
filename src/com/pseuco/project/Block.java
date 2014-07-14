@@ -16,4 +16,5 @@ public class Block {
 	public boolean equals(Block b){
 		return this.states.equals(b.getStates());
 	}
+	
 }
