@@ -156,14 +156,18 @@ public class MinimizationMonitor {
 			//Schalte Thread aus, arbeit ist vorbei;
 			Thread.currentThread().interrupt();
 		//
-		for(BlockTuple b : toDoList){
-			if(! ( currentlyDoneList.contains(b.getBlockOne())
-					|| currentlyDoneList.contains(b.getBlockTwo()))){
-				res = b;
-				break;
+		while(res == null){
+			for(BlockTuple b : toDoList){
+				if(! ( currentlyDoneList.contains(b.getBlockOne())
+						|| currentlyDoneList.contains(b.getBlockTwo()))){
+					res = b;
+					break;
+				}		
 			}
-					
+			if(res == null)
+				wait();
 		}
+		System.out.println(res.toString());
 		toDoList.remove(res);
 		currentlyDoneList.add(res.getBlockOne());
 		currentlyDoneList.add(res.getBlockTwo());
