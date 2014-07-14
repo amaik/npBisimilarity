@@ -13,6 +13,8 @@ public class MinimizationMonitor {
 	
 	private  HashSet<Block> currentlyDoneList = new HashSet<Block>();
 	
+	private  HashSet<Block> existingBlocks = new HashSet<Block>();
+	
 	private  HashSet<Transition> weakTransitionRelation;
 	
 	private  boolean workFinished = false;
@@ -24,6 +26,7 @@ public class MinimizationMonitor {
 	public MinimizationMonitor(HashSet<State> startPartition,HashSet<Transition> weakTransRel ){
 		Block startP = new Block(startPartition);
 		partition.add(startP);
+		existingBlocks.add(startP);
 		weakTransitionRelation = weakTransRel;
 		toDoList.add(new BlockTuple(startP, startP));
 	}
@@ -178,55 +181,47 @@ public class MinimizationMonitor {
 	 * Computes the new blocks that are todo. It erases the blocks out of currentlyDoneList, that 
 	 * are not needed anymore.
 	 * newBlocks contains the new Blocks.
-	 * toDelete is the Block that has to be erased from currentlyDoneList
+	 * notSplitted is the Block that has to be erased from currentlyDoneList
 	 * splitted is the Block that was splitted apart
 	 */
-	synchronized  public void computeNewToDosAndEnd(BlockTuple newBlocks,Block splitted,Block toDelete){
+	synchronized  public void computeNewToDosAndEnd(BlockTuple newBlocks,Block splitted,Block notSplitted){
 		//Füge zuerst in HashSet ein und vereinige died mit toDoList
 		//sonst iterator überschreiben
 		HashSet<BlockTuple> toAdd = new HashSet<BlockTuple>();
 		HashSet<BlockTuple> toDel = new HashSet<BlockTuple>();
 		Block nOne = newBlocks.getBlockOne();
 		Block nTwo = newBlocks.getBlockTwo();
+		existingBlocks.remove(splitted);
+		//existingBlocks.add(nOne);
+		//existingBlocks.add(nTwo);
 		//Füge zu toAdd die neun BlockTuple hinzu, diemit toDelete entstehe, da toDelete eventuell nicht 
 		//mehr in der toDoList ist
-		toAdd.add(new BlockTuple(nOne,toDelete));
-		toAdd.add(new BlockTuple(nTwo,toDelete));
 		toAdd.add(new BlockTuple(nOne,nTwo));
+		toAdd.add(new BlockTuple(nOne,nOne));
+		toAdd.add(new BlockTuple(nTwo,nTwo));
+		
 		Block bOne;
 		Block bTwo;
-		boolean check1 = false,check2= false;
 		//Berechne neue todos und markiere welche zu löschen sind
 		for(BlockTuple b : toDoList){
 			bOne = b.getBlockOne();
 			bTwo = b.getBlockTwo();
-			if(!bOne.equals(splitted)){
-				toAdd.add(new BlockTuple(nOne,bOne));
-				toAdd.add(new BlockTuple(nTwo,bOne));
-				check1 = true;
-			}
-			if(!bTwo.equals(splitted)){
-				toAdd.add(new BlockTuple(nOne,bTwo));
-				toAdd.add(new BlockTuple(nTwo,bTwo));
-				check2 = true;
-			}
-			if(check1 || check2)
+			if(bOne.equals(splitted) || bTwo.equals(splitted))
 				toDel.add(b);
-			check1 = false; check2 = false;
 		}
-		//Es kann sein dass verschiedene Blöcke nicht in der ToDo List stehen aber 
-		// trotzdem neue toDos damit berechnet werden müssen
-		for(Block b : currentlyDoneList){
-			toAdd.add(new BlockTuple(nOne,b));
-			toAdd.add(new BlockTuple(nTwo,b));
+		for(Block b : existingBlocks){
+			toAdd.add(new BlockTuple(nOne, b));
+			toAdd.add(new BlockTuple(nTwo, b));
 		}
+		existingBlocks.add(nOne);
+		existingBlocks.add(nTwo);
 		//Füge Hinzu/lösche
 		toDoList.addAll(toAdd);
 		toDoList.removeAll(toDel);
 		
 		//Remove the Blocks from CurrentlyDone
 		currentlyDoneList.remove(splitted);
-		currentlyDoneList.remove(toDelete);
+		currentlyDoneList.remove(notSplitted);
 		
 		//Füge die neuen Blöcke in die Partition ein
 		partition.remove(splitted);
