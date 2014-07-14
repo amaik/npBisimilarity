@@ -312,7 +312,8 @@ public class Main {
 
 		MinimizationMonitor moni = new MinimizationMonitor(lts.getStates(),
 				lts.getWeakTransitionRelation());
-		int avProc = Runtime.getRuntime().availableProcessors();
+		//int avProc = Runtime.getRuntime().availableProcessors();
+		int avProc = 1;
 		Thread[] threads = new Thread[avProc + 1];
 		for (int i = 0; i <= avProc; i++) {
 			Thread freddi = new Thread(moni.runner);

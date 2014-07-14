@@ -57,7 +57,7 @@ public class MinimizationMonitor {
 			}
 		}
 		
-		return res;
+		return (HashSet<State>) res.clone();
 	}
 	
 	//returns all actions for the given weakTransitionRelation
@@ -101,7 +101,7 @@ public class MinimizationMonitor {
 						//zu beginn = pre(one, a) und pre(one,a) gebraucht wird um 
 						//stateComplement zu bilden
 						stateIntersection = pre(two,a);
-						stateComplement = one.getStates();
+						stateComplement = (HashSet<State>) one.getStates().clone();		
 						stateComplement.removeAll(stateIntersection);
 						stateIntersection.retainAll(one.getStates());
 						if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
@@ -116,7 +116,7 @@ public class MinimizationMonitor {
 						//Richtung 2
 					
 						stateIntersection = pre(one,a);
-						stateComplement = two.getStates();
+						stateComplement = (HashSet<State>) two.getStates().clone();
 						stateComplement.removeAll(stateIntersection);
 						stateIntersection.retainAll(two.getStates());
 						if(!(stateIntersection.isEmpty()) && !(stateComplement.isEmpty())){
@@ -128,7 +128,8 @@ public class MinimizationMonitor {
 							break;
 						}
 					}
-					takeOutOfCurrentlyDoneList(one, two);
+					if(!success)
+						takeOutOfCurrentlyDoneList(one, two);
 				}
 			}
 		}
