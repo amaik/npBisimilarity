@@ -18,7 +18,7 @@ public class LTS {
 
 	private final HashSet<Transition> transitionRelation;
 
-	private HashSet<Transition> weakTransitionRelation = new HashSet<Transition>();
+	private final HashSet<Transition> weakTransitionRelation = new HashSet<Transition>();
 
 	/*
 	 * Konstruktor
@@ -44,6 +44,32 @@ public class LTS {
 		generateWeakTransitionRelation(); // warum nicht im konstruktor
 											// aufrufen? Kann man machen
 
+	}
+
+	public LTS(State newStart, HashSet<State> reachedStates,
+			HashSet<Transition> newTransitions) {
+		this.startState = newStart;
+		this.states.add(newStart);
+		this.states.addAll(reachedStates);
+
+		// Add actions i possible in every LTS
+		Action τ = new Action("τ");
+		this.actions = new HashSet<Action>();
+		this.actions.add(τ);
+		this.actions.addAll(getActionsFromTransitions(newTransitions));
+
+		// Add transitions
+		this.transitionRelation = new HashSet<Transition>();
+		this.transitionRelation.addAll(newTransitions);
+		//no need to generate Weak Transitions
+	}
+	
+	public HashSet<Action> getActionsFromTransitions(HashSet<Transition> Transitions) {
+		HashSet<Action> res=new HashSet<Action>();
+		for (Transition trans : Transitions) {
+			res.add(trans.getTransAction());
+		}
+		return res;
 	}
 
 	/*
@@ -86,6 +112,14 @@ public class LTS {
 		}
 
 	}
+	
+	public State getStateWithName(String name) {
+		for (State i : this.states) {
+			if (i.getName().equals(name))
+				return i;
+		}
+		throw new NullPointerException("There's no state with the given name");
+	}
 
 	/*
 	 * Returns all transitions that start at the given state
@@ -93,6 +127,22 @@ public class LTS {
 	public HashSet<Transition> getOutgoingTransitions(State state) {
 		HashSet<Transition> res = new HashSet<Transition>();
 		for (Transition tran : this.transitionRelation) {
+			if (tran.getSrcState().equals(state)) // Start state of the
+													// transitions equals the
+													// given state
+			{
+				res.add(tran);
+			}
+		}
+		return res;
+	}
+	
+	/*
+	 * Returns all transitions that start at the given state
+	 */
+	public HashSet<Transition> getOutgoingWeakTransitions(State state) {
+		HashSet<Transition> res = new HashSet<Transition>();
+		for (Transition tran : this.weakTransitionRelation) {
 			if (tran.getSrcState().equals(state)) // Start state of the
 													// transitions equals the
 													// given state
@@ -177,6 +227,8 @@ public class LTS {
 		}
 
 	}
+	
+	
 	
 	public String genereateJSONLtsForm(){
 		String result = new String();
