@@ -335,6 +335,9 @@ public class Main {
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
 		System.out.println("alex hat scheisse gebaut");
 		HashSet<Block> partition = minifyPartition(lts);
+		System.out.println("Final Partition");
+		for (Block b : partition) 
+			System.out.println(b.toString());
 		System.out.println("max hat scheisse gebaut	");
 		HashMap<State,Block> StateToBlock = new HashMap<State,Block>(); //Maps a state in the old lts to its containing block
 		HashMap<Block, State> BlockToState = new HashMap<Block,State>(); //maps a block to a state in the new lts
