@@ -348,7 +348,8 @@ public class Main {
 			 }
 			 State newState= new State(Integer.toString(i));
 			 newStates.add(newState);
-			 BlockToState.put(block, newState);	 
+			 BlockToState.put(block, newState);	
+			 i++;
 		 } 
 		 HashSet<State> reachedStates = new HashSet<State>(); 
 		 HashSet<Transition> newTransitions= new HashSet<Transition>();
