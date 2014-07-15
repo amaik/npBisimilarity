@@ -13,8 +13,6 @@ public class MinimizationMonitor {
 	
 	private  HashSet<Block> currentlyDoneList = new HashSet<Block>();
 	
-	private  HashSet<Block> existingBlocks = new HashSet<Block>();
-	
 	private  HashSet<Transition> weakTransitionRelation;
 	
 	private  boolean workFinished = false;
@@ -26,7 +24,6 @@ public class MinimizationMonitor {
 	public MinimizationMonitor(HashSet<State> startPartition,HashSet<Transition> weakTransRel ){
 		Block startP = new Block(startPartition);
 		partition.add(startP);
-		existingBlocks.add(startP);
 		weakTransitionRelation = weakTransRel;
 		toDoList.add(new BlockTuple(startP, startP));
 	}
@@ -82,8 +79,10 @@ public class MinimizationMonitor {
 				try {
 					next = getNextToDoAndStart();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					return;
 				}
+				if(next == null)
+					return;
 				synchronized(next){
 					Block one;
 					Block two;
@@ -117,7 +116,6 @@ public class MinimizationMonitor {
 						}
 					
 						//Richtung 2
-					
 						stateIntersection = pre(one,a);
 						stateComplement = (HashSet<State>) two.getStates().clone();
 						stateComplement.removeAll(stateIntersection);
@@ -157,7 +155,7 @@ public class MinimizationMonitor {
 			wait();
 		if(workFinished)
 			//Schalte Thread aus, arbeit ist vorbei;
-			Thread.currentThread().interrupt();
+			return null;
 		//
 		while(res == null){
 			if(workFinished)
@@ -172,7 +170,6 @@ public class MinimizationMonitor {
 			if(res == null)
 				wait();
 		}
-		System.out.println(res.toString());
 		toDoList.remove(res);
 		currentlyDoneList.add(res.getBlockOne());
 		currentlyDoneList.add(res.getBlockTwo());
@@ -193,7 +190,9 @@ public class MinimizationMonitor {
 		HashSet<BlockTuple> toDel = new HashSet<BlockTuple>();
 		Block nOne = newBlocks.getBlockOne();
 		Block nTwo = newBlocks.getBlockTwo();
-		existingBlocks.remove(splitted);
+		partition.remove(splitted);
+		if(splitted.equals(notSplitted))
+			partition.remove(notSplitted);
 		//existingBlocks.add(nOne);
 		//existingBlocks.add(nTwo);
 		//Füge zu toAdd die neun BlockTuple hinzu, diemit toDelete entstehe, da toDelete eventuell nicht 
@@ -211,12 +210,12 @@ public class MinimizationMonitor {
 			if(bOne.equals(splitted) || bTwo.equals(splitted))
 				toDel.add(b);
 		}
-		for(Block b : existingBlocks){
+		for(Block b : partition){
 			toAdd.add(new BlockTuple(nOne, b));
 			toAdd.add(new BlockTuple(nTwo, b));
 		}
-		existingBlocks.add(nOne);
-		existingBlocks.add(nTwo);
+		partition.add(nOne);
+		partition.add(nTwo);
 		//Füge Hinzu/lösche
 		toDoList.addAll(toAdd);
 		toDoList.removeAll(toDel);
@@ -225,10 +224,6 @@ public class MinimizationMonitor {
 		currentlyDoneList.remove(splitted);
 		currentlyDoneList.remove(notSplitted);
 		
-		//Füge die neuen Blöcke in die Partition ein
-		partition.remove(splitted);
-		partition.add(nOne);
-		partition.add(nTwo);
 		
 		//workFinished muss gesetzt werden
 		if(toDoList.isEmpty() && currentlyDoneList.isEmpty())

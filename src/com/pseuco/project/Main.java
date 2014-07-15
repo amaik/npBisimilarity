@@ -333,7 +333,6 @@ public class Main {
 
 	// creates a new beobachtungskongruentes lts to the given lts
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
-		System.out.println("alex hat scheisse gebaut");
 		HashSet<Block> partition = minifyPartition(lts);
 		System.out.println("Final Partition");
 		for (Block b : partition) 
