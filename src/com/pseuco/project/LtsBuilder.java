@@ -22,7 +22,7 @@ public class LtsBuilder {
 		this.VisitedBlocks = new HashSet<Block>();
 	}
 	
-	//returns all outgoing transitions from the given state 
+	//returns all outgoing weak transitions from the given state in the old lts 
 		public  HashSet<Transition> getOutgoingTransition(State state) {
 				HashSet<Transition> res = new HashSet<Transition>();
 				for (Transition trans: this.weakTransitions) {
@@ -39,6 +39,7 @@ public class LtsBuilder {
 			return BlockToState.get(containingBlock);
 		}
 	
+	//goes recursive thorugh the old lts and builds the transitions in the new lts
 	public void createTransitions(State currrentState, Boolean startState) {
 			
 			HashSet<Transition> outgoing = getOutgoingTransition(currrentState);

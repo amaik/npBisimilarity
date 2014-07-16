@@ -357,7 +357,7 @@ public class Main {
 		 
 		 State oldStart = lts.getStartState();
 		 State newStart = builder.getMatchingState(oldStart);
-		 builder.getReachedStates().add(oldStart);
+		 builder.getReachedStates().add(newStart);
 		 builder.createTransitions(oldStart, true);
 	
 		 
