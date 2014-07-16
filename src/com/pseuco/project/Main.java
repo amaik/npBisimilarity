@@ -376,39 +376,6 @@ public class Main {
 	}
 	
 	
-	//creates outgoing transitions from the given state into the newTransitions hashSet
-	public static void createTransitions(State currentState, HashSet<State> reachedStates, HashSet<Transition> newTransitions, 
-			HashSet<Transition> weakTransitions, HashMap<State,Block> StateToBlock, HashMap<Block, State> BlockToState, Boolean startState) {
-			
-			HashSet<Transition> outgoing = getOutgoingTransition(currentState, weakTransitions);
-			State newSrcState = getMatchingState(currentState, StateToBlock, BlockToState);
-			Block newSrcBlock = StateToBlock.get(currentState);
-			for (Transition trans : outgoing) {
-				Block newTarBlock = StateToBlock.get(trans.getTarState());
-				if (newSrcBlock.equals(newTarBlock)) { //falls Start und Zielzustand im gleichen Block leigen
-					if (trans.isIntern())  { //is the transition uses and internal action 
-						if (startState) { //only draw an internal action from block->equal block if it is outgoing from the first state
-							State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
-							Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
-							newTransitions.add(newTrans);
-							//reachedStates.add(newTarState); first state is always reachable		
-						}
-					}
-					else { //always create external transitions
-						State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
-						Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
-						newTransitions.add(newTrans);
-						//reachedStates.add(newTarState); muss glaub ich
-					}
-				}
-				else { //falls verschiedene Blöcke muss ich Aktion auf jeden Fall bauen 
-					State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
-					Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
-					newTransitions.add(newTrans);
-					reachedStates.add(newTarState);					
-				}
-			}
-	}*/
 
 	
 }
