@@ -359,17 +359,7 @@ public class Main {
 		 State newStart = builder.getMatchingState(oldStart);
 		 builder.getReachedStates().add(oldStart);
 		 builder.createTransitions(oldStart, true);
-		// createTransitions(oldStart, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, true);
-		 
-		 /*
-		 for (Block block : partition) { //start createtransitions once for a state out of every block
-			 State state=null;
-			 for (State stateGetter : block.getStates()) {//alter wie hässlich fuck u java
-				 state=stateGetter; //hoffen ma ma es gibt keene leere states
-				 break;	 
-			 }
-			 createTransitions(state, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, false);
-		 } */
+	
 		 
  		 LTS newLts = new LTS(newStart, builder.getReachedStates(), builder.getNewTransitions());
 		return newLts;
