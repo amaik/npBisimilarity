@@ -337,7 +337,7 @@ public class Main {
 		System.out.println("Final Partition");
 		for (Block b : partition) 
 			System.out.println(b.toString());
-		System.out.println("max hat scheisse gebaut	");
+	
 		HashMap<State,Block> StateToBlock = new HashMap<State,Block>(); //Maps a state in the old lts to its containing block
 		HashMap<Block, State> BlockToState = new HashMap<Block,State>(); //maps a block to a state in the new lts
 		HashSet<State> newStates = new HashSet<State>();
@@ -351,15 +351,16 @@ public class Main {
 			 BlockToState.put(block, newState);	
 			 i++;
 		 } 
-		 HashSet<State> reachedStates = new HashSet<State>(); 
-		 HashSet<Transition> newTransitions= new HashSet<Transition>();
- 
+		
+		 LtsBuilder builder= new LtsBuilder(StateToBlock, BlockToState, lts.getWeakTransitionRelation());
+		 
 		 State oldStart = lts.getStartState();
-		 State newStart = getMatchingState(oldStart, StateToBlock, BlockToState);
-		 reachedStates.add(newStart);
+		 State newStart = builder.getMatchingState(oldStart);
+		 builder.getReachedStates().add(oldStart);
+		 builder.createTransitions(oldStart, true);
+		// createTransitions(oldStart, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, true);
 		 
-		 createTransitions(oldStart, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, true);
-		 
+		 /*
 		 for (Block block : partition) { //start createtransitions once for a state out of every block
 			 State state=null;
 			 for (State stateGetter : block.getStates()) {//alter wie hässlich fuck u java
@@ -367,29 +368,14 @@ public class Main {
 				 break;	 
 			 }
 			 createTransitions(state, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, false);
-		 } 
+		 } */
 		 
- 		 LTS newLts = new LTS(newStart, reachedStates, newTransitions);
+ 		 LTS newLts = new LTS(newStart, builder.getReachedStates(), builder.getNewTransitions());
 		return newLts;
 	}
 	
 	
-	//returns all outgoing transitions from the given state 
-	public static HashSet<Transition> getOutgoingTransition(State state, HashSet<Transition> weakTrans) {
-			HashSet<Transition> res = new HashSet<Transition>();
-			for (Transition trans: weakTrans) {
-				if(trans.getSrcState().equals(state))
-					res.add(trans);
-			}
-			return res;
-			
-	}
-	
-	//returns the matching state in the new lts , based on the given state in the old lts
-	public static State getMatchingState(State oldState ,HashMap<State,Block> StateToBlock, HashMap<Block, State> BlockToState) {
-		Block containingBlock = StateToBlock.get(oldState);
-		return BlockToState.get(containingBlock);
-	}
+	/*
 	
 		
 	
@@ -415,7 +401,7 @@ public class Main {
 						State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
 						Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
 						newTransitions.add(newTrans);
-						reachedStates.add(newTarState);
+						//reachedStates.add(newTarState); muss glaub ich
 					}
 				}
 				else { //falls verschiedene Blöcke muss ich Aktion auf jeden Fall bauen 
@@ -425,7 +411,7 @@ public class Main {
 					reachedStates.add(newTarState);					
 				}
 			}
-	}
+	}*/
 
 	
 }
