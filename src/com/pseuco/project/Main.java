@@ -270,8 +270,10 @@ public class Main {
 			/*
 			 * Genrate new LTS in LTS-JSON-Format
 			 */
-
 			String minJSON = minified.genereateJSONLtsForm();
+			/*
+			 * Print minified LTS
+			 */
 			System.out.print(minJSON);
 
 		} else if (args.length == 1 && args[0].equals("-wk")) {
@@ -330,8 +332,7 @@ public class Main {
 		return moni.getPartition();
 
 	}
-
-	// creates a new beobachtungskongruentes lts to the given lts
+// creates a new beobachtungskongruentes lts to the given lts
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
 		HashSet<Block> partition = minifyPartition(lts);
 		System.out.println("Final Partition");
@@ -375,17 +376,13 @@ public class Main {
 	}
 	
 	
-	/*
-	
-		
-	
 	//creates outgoing transitions from the given state into the newTransitions hashSet
-	public static void createTransitions(State currrentState, HashSet<State> reachedStates, HashSet<Transition> newTransitions, 
+	public static void createTransitions(State currentState, HashSet<State> reachedStates, HashSet<Transition> newTransitions, 
 			HashSet<Transition> weakTransitions, HashMap<State,Block> StateToBlock, HashMap<Block, State> BlockToState, Boolean startState) {
 			
-			HashSet<Transition> outgoing = getOutgoingTransition(currrentState, weakTransitions);
-			State newSrcState = getMatchingState(currrentState, StateToBlock, BlockToState);
-			Block newSrcBlock = StateToBlock.get(currrentState);
+			HashSet<Transition> outgoing = getOutgoingTransition(currentState, weakTransitions);
+			State newSrcState = getMatchingState(currentState, StateToBlock, BlockToState);
+			Block newSrcBlock = StateToBlock.get(currentState);
 			for (Transition trans : outgoing) {
 				Block newTarBlock = StateToBlock.get(trans.getTarState());
 				if (newSrcBlock.equals(newTarBlock)) { //falls Start und Zielzustand im gleichen Block leigen
