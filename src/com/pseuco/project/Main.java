@@ -389,6 +389,7 @@ public class Main {
 	
 		 
  		 LTS newLts = new LTS(newStart, builder.getReachedStates(), builder.getNewTransitions());
+ 		 newLts.minimizeTransitions();
 		return newLts;
 	}
 	

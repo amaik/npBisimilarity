@@ -98,6 +98,8 @@ public class LtsBuilder {
 		return this.reachedStates;
 	}
 	
+	
+	
 	public HashSet<Transition> getNewTransitions() {
 		return this.newTransitions;
 	}

@@ -227,7 +227,79 @@ public class LTS {
 		}
 
 	}
-	
+
+
+	// Start is the state the Transitions are computed for
+	// current is the current State in the recursive descent
+	public void generateTheREALWeakTransitions(State start, State current,
+			Boolean UsedStrong, Action StrongAction,
+			HashSet<State> alreadyVisited, int ActionsUsed) {
+
+		if (start == null) {
+			throw new NullPointerException("start == null");
+		}
+
+		alreadyVisited.add(current);
+
+		for (Transition i : this.getOutgoingTransitions(current)) { // iteriere
+																	// über
+																	// ausgehende
+																	// transitionen
+			State transTarget = i.getTarState(); // ziel der aktuellen
+													// transition
+
+			/* Jeder zustand kann sich selbst aber schwach erreichen! */
+
+			if (i.isIntern()) { // man kommt zu dem Folgezustand über eine
+								// schwache Aktion (Transition? Es gibt keine
+								// schwachen Aktionen)
+				if (UsedStrong) { // falls schon starke genutzt
+
+					if (ActionsUsed > 0) {
+					Transition newTrans = new Transition(start, transTarget,
+							StrongAction);
+					this.addToWeakTrans(newTrans);}
+					HashSet<State> newAlreadyVisited = new HashSet<State>(
+							alreadyVisited); // neues HashSet falls Backtracking
+					if (!alreadyVisited.contains(transTarget)) { // gegen zykel
+						this.generateTheREALWeakTransitions(start, transTarget,
+								UsedStrong, StrongAction, newAlreadyVisited, ActionsUsed+1);
+					}
+				} else if (!UsedStrong) { // falls noch keien starke genutzt
+					// erzeuge neue transition vom start zustand zum
+					// folgenden
+					if (ActionsUsed > 0) {
+					Transition newTrans = new Transition(start, transTarget,
+							i.getTransAction());
+					this.addToWeakTrans(newTrans); }
+					HashSet<State> newAlreadyVisited = new HashSet<State>(
+							alreadyVisited);
+					if (!alreadyVisited.contains(transTarget)) {
+						this.generateTheREALWeakTransitions(start, transTarget,
+								UsedStrong, StrongAction, newAlreadyVisited,ActionsUsed+1);
+					}
+				}
+			} else { // starke Transition
+				if (!UsedStrong) { // nur falls noch keine starke genutzt
+									// wurde
+					// erzeuge neue transition vom start zustand zum
+					// folgenden
+					if (ActionsUsed > 0) {
+					Transition newTrans = new Transition(start, transTarget,
+							i.getTransAction()); 
+					this.addToWeakTrans(newTrans); }
+					HashSet<State> newAlreadyVisited = new HashSet<State>(
+							alreadyVisited);
+					if (!alreadyVisited.contains(transTarget)) {
+						this.generateTheREALWeakTransitions(start, transTarget,
+								true, i.getTransAction(), newAlreadyVisited, ActionsUsed+1);
+					}
+				}
+
+			}
+		}
+
+	}
 	
 	
 	public JsonObject generateJSONLtsForm(){
@@ -249,6 +321,28 @@ public class LTS {
 				.add("states", statesObject)
 				.build();
 		return ltsObject;
+	}
+	
+public void minimizeTransitions() {
+	
+	this.weakTransitionRelation.clear();
+	for (State i : this.states) {
+
+		HashSet<State> alreadyVisited = new HashSet<State>();
+		this.generateTheREALWeakTransitions(i, i, false, null,alreadyVisited, 0);
+				
+	}
+	
+	HashSet<Transition> toDelete = new HashSet<Transition>();
+		for (Transition trans : this.transitionRelation){
+			for (Transition weak : this.getWeakTransitionRelation()){
+				if(trans.equals(weak)) {
+					toDelete.add(trans);
+				}
+			}
+		}
+		
+		this.transitionRelation.removeAll(toDelete);
 	}
 	
 	public String generateJSONLtsString(){
