@@ -303,9 +303,7 @@ public class Main {
 			openInBrowserDemo(minified.generateJSONLtsForm());
 			
 		}
-		
-		
-		} else if (args.length == 1 && args[0].equals("-wk")) {
+		else if (args.length == 1 && args[0].equals("-wk")) {
 			// started with command line argument -wk
 
 
