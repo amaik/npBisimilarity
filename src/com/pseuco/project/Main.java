@@ -426,6 +426,9 @@ public class Main {
 				else { //falls verschiedene Blöcke muss ich Aktion auf jeden Fall bauen 
 					State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
 					Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
+					/*
+					 * Hier muüssen noch alternative Wege hin, wie felix gesagt hat
+					 */
 					newTransitions.add(newTrans);
 					reachedStates.add(newTarState);					
 				}
