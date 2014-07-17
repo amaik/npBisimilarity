@@ -298,9 +298,13 @@ public class Main {
 			/*
 			 * Print minified LTS
 			 */
-			System.out.print(minJSON);
-
 			openInBrowserDemo(minified.generateJSONLtsForm());
+			while(true){
+				input = readStandardInput();
+				lts = parseAndGenerateLTS(input);
+				openInBrowserDemo(lts.generateJSONLtsForm());
+				
+			}
 			
 		} else if (args.length == 1 && args[0].equals("-wk")) {
 			// started with command line argument -wk
@@ -362,10 +366,6 @@ public class Main {
 // creates a new beobachtungskongruentes lts to the given lts
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
 		HashSet<Block> partition = minifyPartition(lts);
-		System.out.println("Final Partition");
-		for (Block b : partition) 
-			System.out.println(b.toString());
-	
 		HashMap<State,Block> StateToBlock = new HashMap<State,Block>(); //Maps a state in the old lts to its containing block
 		HashMap<Block, State> BlockToState = new HashMap<Block,State>(); //maps a block to a state in the new lts
 		HashSet<State> newStates = new HashSet<State>();
@@ -391,7 +391,6 @@ public class Main {
  		 LTS newLts = new LTS(newStart, builder.getReachedStates(), builder.getNewTransitions());
 		return newLts;
 	}
-	
 	
 	
 }
