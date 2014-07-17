@@ -11,15 +11,17 @@ public class LtsBuilder {
 	private final HashMap<State,Block> StateToBlock; 
 	private final HashMap<Block, State> BlockToState;
 	private final HashSet<Block> VisitedBlocks;
+	private final HashSet<Transition> oldTransitions;
 	
 	
-	public LtsBuilder(HashMap<State,Block> StateToBlock,	HashMap<Block, State> BlockToState, HashSet<Transition> weakTransitions) {
+	public LtsBuilder(HashMap<State,Block> StateToBlock,	HashMap<Block, State> BlockToState, HashSet<Transition> weakTransitions, HashSet<Transition> oldTransitions) {
 		this.reachedStates = new HashSet<State>(); 
 		this.newTransitions= new HashSet<Transition>();
 		this.weakTransitions = weakTransitions;
 		this.StateToBlock = StateToBlock;
 		this.BlockToState = BlockToState;
 		this.VisitedBlocks = new HashSet<Block>();
+		this.oldTransitions= oldTransitions;
 	}
 	
 	//returns all outgoing weak transitions from the given state in the old lts 
@@ -39,6 +41,19 @@ public class LtsBuilder {
 			return BlockToState.get(containingBlock);
 		}
 	
+	//returns if you should create the i-Transition in the start state
+	private boolean internInStart(State state) {
+		for (Transition trans : this.oldTransitions){
+			
+			Block b1 = StateToBlock.get(trans.getTarState());
+			Block b2 = StateToBlock.get(state);
+			if (trans.getSrcState().equals(state) && b1.equals(b2)) {
+				if (trans.isIntern())
+					return true;
+			}
+		}
+		return false;
+	}
 	//goes recursive thorugh the old lts and builds the transitions in the new lts
 	public void createTransitions(State currrentState, Boolean startState) {
 			
@@ -51,9 +66,12 @@ public class LtsBuilder {
 				if (newSrcBlock.equals(newTarBlock)) { //falls Start und Zielzustand im gleichen Block leigen
 					if (trans.isIntern())  { //is the transition uses and internal action 
 						if (startState) { //only draw an internal action from block->equal block if it is outgoing from the first state
-							State newTarState = getMatchingState(trans.getTarState()); //tarState in new lts
-							Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
-							newTransitions.add(newTrans);
+							if (internInStart(currrentState))
+							{
+								State newTarState = getMatchingState(trans.getTarState()); //tarState in new lts
+								Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
+								newTransitions.add(newTrans);
+							}
 							//reachedStates.add(newTarState); first state is always reachable		
 						}
 					}
