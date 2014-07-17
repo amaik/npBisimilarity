@@ -263,12 +263,12 @@ public class Main {
 			LTS lts = parseAndGenerateLTS(input);
 
 			/*
-			 * Minify LTS - has to be concurrent TODO
+			 * Minify LTS - concurrent
 			 */
 			
 			LTS minified = minifyLTS(lts);
 			/*
-			 * Genrate new LTS in LTS-JSON-Format
+			 * Generate new LTS in LTS-JSON-Format
 			 */
 			String minJSON = minified.generateJSONLtsString();
 			/*
@@ -277,7 +277,7 @@ public class Main {
 			System.out.print(minJSON);
 
 		} else if (args.length == 1 && args[0].equals("-wk")) {
-			// started with command line argument -i
+			// started with command line argument -wk
 
 			// read the input
 			String input = readStandardInput();
