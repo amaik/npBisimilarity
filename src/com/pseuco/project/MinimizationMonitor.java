@@ -151,7 +151,7 @@ public class MinimizationMonitor {
 	synchronized public BlockTuple getNextToDoAndStart() throws InterruptedException{
 
 		BlockTuple res = null;
-		while(toDoList.isEmpty())
+		while(toDoList.isEmpty() && !workFinished)
 			wait();
 		if(workFinished)
 			//Schalte Thread aus, arbeit ist vorbei;
