@@ -380,7 +380,7 @@ public class Main {
 			 i++;
 		 } 
 		
-		 LtsBuilder builder= new LtsBuilder(StateToBlock, BlockToState, lts.getWeakTransitionRelation());
+		 LtsBuilder builder= new LtsBuilder(StateToBlock, BlockToState, lts.getWeakTransitionRelation(), lts.getTransitionRelation());
 		 
 		 State oldStart = lts.getStartState();
 		 State newStart = builder.getMatchingState(oldStart);
