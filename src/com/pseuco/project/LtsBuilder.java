@@ -69,7 +69,7 @@ public class LtsBuilder {
 					Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
 					newTransitions.add(newTrans);
 					reachedStates.add(newTarState);
-					if (!this.VisitedBlocks.contains(newSrcBlock))
+					if (!this.VisitedBlocks.contains(newTarBlock)) //tar oder source block? ich glaub jo tar
 						this.createTransitions(trans.getTarState(), false);
 				}
 			}
