@@ -276,7 +276,34 @@ public class Main {
 			 */
 			System.out.print(minJSON);
 
-		} else if (args.length == 1 && args[0].equals("-wk")) {
+		} 
+		else if (args.length == 1 && args[0].equals("-b")) {
+			String input = readStandardInput();
+
+			/*
+			 * Parse the Input LTS and Generate the Class
+			 */
+			LTS lts = parseAndGenerateLTS(input);
+
+			/*
+			 * Minify LTS - has to be concurrent TODO
+			 */
+			
+			LTS minified = minifyLTS(lts);
+			/*
+			 * Genrate new LTS in LTS-JSON-Format
+			 */
+			String minJSON = minified.generateJSONLtsString();
+			/*
+			 * Print minified LTS
+			 */
+			System.out.print(minJSON);
+
+			openInBrowserDemo(minified.generateJSONLtsForm());
+			
+		}
+		
+		else if (args.length == 1 && args[0].equals("-wk")) {
 			// started with command line argument -i
 
 			// read the input
