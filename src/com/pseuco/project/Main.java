@@ -268,13 +268,14 @@ public class Main {
 			
 			LTS minified = minifyLTS(lts);
 			/*
-			 * Genrate new LTS in LTS-JSON-Format
+			 * Generate new LTS in LTS-JSON-Format
 			 */
 			String minJSON = minified.generateJSONLtsString();
 			/*
 			 * Print minified LTS
 			 */
 			System.out.print(minJSON);
+
 
 		} 
 		else if (args.length == 1 && args[0].equals("-b")) {
@@ -303,8 +304,10 @@ public class Main {
 			
 		}
 		
-		else if (args.length == 1 && args[0].equals("-wk")) {
-			// started with command line argument -i
+		
+		} else if (args.length == 1 && args[0].equals("-wk")) {
+			// started with command line argument -wk
+
 
 			// read the input
 			String input = readStandardInput();
