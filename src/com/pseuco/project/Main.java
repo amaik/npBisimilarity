@@ -270,7 +270,7 @@ public class Main {
 			/*
 			 * Genrate new LTS in LTS-JSON-Format
 			 */
-			String minJSON = minified.genereateJSONLtsForm();
+			String minJSON = minified.generateJSONLtsString();
 			/*
 			 * Print minified LTS
 			 */
@@ -332,16 +332,13 @@ public class Main {
 		return moni.getPartition();
 
 	}
-
-	// creates a new beobachtungskongruentes lts to the given lts
+// creates a new beobachtungskongruentes lts to the given lts
 	public static LTS minifyLTS(LTS lts) throws InterruptedException {
 		HashSet<Block> partition = minifyPartition(lts);
 		System.out.println("Final Partition");
 		for (Block b : partition) 
 			System.out.println(b.toString());
-		System.out.println("max hat scheisse gebaut	");
-		
-		//instanziiere Maps
+	
 		HashMap<State,Block> StateToBlock = new HashMap<State,Block>(); //Maps a state in the old lts to its containing block
 		HashMap<Block, State> BlockToState = new HashMap<Block,State>(); //maps a block to a state in the new lts
 		HashSet<State> newStates = new HashSet<State>();
@@ -356,84 +353,18 @@ public class Main {
 			 i++;
 		 } 
 		
-		 HashSet<State> reachedStates = new HashSet<State>(); 
-		 HashSet<Transition> newTransitions= new HashSet<Transition>();
- 
+		 LtsBuilder builder= new LtsBuilder(StateToBlock, BlockToState, lts.getWeakTransitionRelation());
+		 
 		 State oldStart = lts.getStartState();
-		 State newStart = getMatchingState(oldStart, StateToBlock, BlockToState);
-		 reachedStates.add(newStart);
+		 State newStart = builder.getMatchingState(oldStart);
+		 builder.getReachedStates().add(newStart);
+		 builder.createTransitions(oldStart, true);
+	
 		 
-		 createTransitions(oldStart, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, true);
-		 
-		 for (Block block : partition) { //start createtransitions once for a state out of every block
-			 State state=null;
-			 for (State stateGetter : block.getStates()) {//alter wie hässlich fuck u java
-				 state=stateGetter; //hoffen ma ma es gibt keene leere states
-				 break;	 
-			 }
-			 createTransitions(state, reachedStates, newTransitions, lts.getWeakTransitionRelation(), StateToBlock, BlockToState, false);
-		 } 
-		 
- 		 LTS newLts = new LTS(newStart, reachedStates, newTransitions);
+ 		 LTS newLts = new LTS(newStart, builder.getReachedStates(), builder.getNewTransitions());
 		return newLts;
 	}
 	
 	
-	//returns all outgoing transitions from the given state 
-	public static HashSet<Transition> getOutgoingTransition(State state, HashSet<Transition> weakTrans) {
-			HashSet<Transition> res = new HashSet<Transition>();
-			for (Transition trans: weakTrans) {
-				if(trans.getSrcState().equals(state))
-					res.add(trans);
-			}
-			return res;
-			
-	}
-	
-	//returns the matching state in the new lts , based on the given state in the old lts
-	public static State getMatchingState(State oldState ,HashMap<State,Block> StateToBlock, HashMap<Block, State> BlockToState) {
-		Block containingBlock = StateToBlock.get(oldState);
-		return BlockToState.get(containingBlock);
-	}
-	
-		
-	
-	//creates outgoing transitions from the given state into the newTransitions hashSet
-	public static void createTransitions(State currentState, HashSet<State> reachedStates, HashSet<Transition> newTransitions, 
-			HashSet<Transition> weakTransitions, HashMap<State,Block> StateToBlock, HashMap<Block, State> BlockToState, Boolean startState) {
-			
-			HashSet<Transition> outgoing = getOutgoingTransition(currentState, weakTransitions);
-			State newSrcState = getMatchingState(currentState, StateToBlock, BlockToState);
-			Block newSrcBlock = StateToBlock.get(currentState);
-			for (Transition trans : outgoing) {
-				Block newTarBlock = StateToBlock.get(trans.getTarState());
-				if (newSrcBlock.equals(newTarBlock)) { //falls Start und Zielzustand im gleichen Block leigen
-					if (trans.isIntern())  { //is the transition uses and internal action 
-						if (startState) { //only draw an internal action from block->equal block if it is outgoing from the first state
-							State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
-							Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
-							newTransitions.add(newTrans);
-							//reachedStates.add(newTarState); first state is always reachable		
-						}
-					}
-					else { //always create external transitions
-						State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
-						Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
-						newTransitions.add(newTrans);
-						reachedStates.add(newTarState);
-					}
-				}
-				else { //falls verschiedene Blöcke muss ich Aktion auf jeden Fall bauen 
-					State newTarState = getMatchingState(trans.getTarState(), StateToBlock, BlockToState); //tarState in new lts
-					Transition newTrans = new Transition(newSrcState,newTarState, trans.getTransAction());
-					/*
-					 * Hier muüssen noch alternative Wege hin, wie felix gesagt hat
-					 */
-					newTransitions.add(newTrans);
-					reachedStates.add(newTarState);					
-				}
-			}
-	}
-
 	
 }

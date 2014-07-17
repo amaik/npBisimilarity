@@ -230,7 +230,7 @@ public class LTS {
 	
 	
 	
-	public String genereateJSONLtsForm(){
+	public JsonObject generateJSONLtsForm(){
 		String result = new String();
 		
 		JsonObjectBuilder statesObjectBuilder = Json.createObjectBuilder();
@@ -248,6 +248,10 @@ public class LTS {
 				.add("initialState", this.startState.toString())
 				.add("states", statesObject)
 				.build();
-		return ltsObject.toString();
+		return ltsObject;
+	}
+	
+	public String generateJSONLtsString(){
+		return this.generateJSONLtsForm().toString();
 	}
 }
