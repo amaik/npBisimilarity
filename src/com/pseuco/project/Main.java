@@ -35,8 +35,8 @@ public class Main {
 
 		String initialStateLabel = ltsObject.getString("initialState");
 
-		System.out.println("The initial state is \"" + initialStateLabel
-				+ "\".");
+		//System.out.println("The initial state is \"" + initialStateLabel
+			//	+ "\".");
 
 		JsonObject statesObject = ltsObject.getJsonObject("states");
 
@@ -70,13 +70,13 @@ public class Main {
 
 				String target = transition.getString("target");
 
-				System.out.println("Saw a transition from \""
+				/*System.out.println("Saw a transition from \""
 						+ state
 						+ "\" with \""
 						+ label
 						+ "\""
 						+ (detailsLabel != null ? " [\"" + detailsLabel + "\"]"
-								: "") + " to \"" + target + "\".");
+								: "") + " to \"" + target + "\".");*/
 
 			}
 
@@ -138,7 +138,7 @@ public class Main {
 		JsonObject ltsObject = Json.createObjectBuilder()
 				.add("initialState", "1").add("states", statesObject).build();
 
-		System.out.println(ltsObject.toString());
+		//System.out.println(ltsObject.toString());
 		return ltsObject;
 	}
 
@@ -152,9 +152,9 @@ public class Main {
 		PseuCoShare sharer = new PseuCoShare();
 
 		try {
-			System.out.print("Submitting file...");
+			//System.out.print("Submitting file...");
 			sharer.submitAndOpenLts(data);
-			System.out.println(" Done.");
+			//System.out.println(" Done.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -252,11 +252,10 @@ public class Main {
 
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-		if (args.length == 1 && args[0].equals("-i")) {
+		if (args.length == 1 && args[0].equals("-i")) {			
 			// started with command line argument -i
 			// read the input
 			String input = readStandardInput();
-
 			/*
 			 * Parse the Input LTS and Generate the Class
 			 */
@@ -274,8 +273,9 @@ public class Main {
 			/*
 			 * Print minified LTS
 			 */
+			
 			System.out.print(minJSON);
-
+			
 
 		} 
 		else if (args.length == 1 && args[0].equals("-b")) {
@@ -299,18 +299,12 @@ public class Main {
 			 * Print minified LTS
 			 */
 			openInBrowserDemo(minified.generateJSONLtsForm());
-			while(true){
-				input = readStandardInput();
-				lts = parseAndGenerateLTS(input);
-				openInBrowserDemo(lts.generateJSONLtsForm());
-
-				while(true){
-				input = readStandardInput();
-				lts = parseAndGenerateLTS(input);
-				openInBrowserDemo(lts.generateJSONLtsForm());
-				
-			}
-			}
+//			while(true){
+//				input = readStandardInput();
+//				lts = parseAndGenerateLTS(input);
+//				openInBrowserDemo(lts.generateJSONLtsForm());
+//
+//			}
 			
 		} else if (args.length == 1 && args[0].equals("-wk")) {
 			// started with command line argument -wk
@@ -334,9 +328,9 @@ public class Main {
 			}
 			Collections.sort(transList);
 
-			System.out.println("weak Transitions: " + weakTransitions.size());
+			//System.out.println("weak Transitions: " + weakTransitions.size());
 			for (String trans : transList) {
-				System.out.println(trans.toString());
+				//System.out.println(trans.toString());
 			}
 
 		} else {
