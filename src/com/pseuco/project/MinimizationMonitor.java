@@ -47,6 +47,7 @@ public class MinimizationMonitor {
 	 * Unlocked Methodds
 	 */
 	//returns the predecessors for all states in the given block b with action alpha
+	@SuppressWarnings("unchecked")
 	public   HashSet<State> pre(Block b, Action alpha){
 		HashSet<State> res = new HashSet<State>();
 		for (State state : b.getStates()) {
@@ -71,6 +72,7 @@ public class MinimizationMonitor {
 	 * Create Runnable
 	 */
 	public  Runnable runner = new Runnable() {
+		@SuppressWarnings({ "unchecked", "unused" })
 		public void run() {
 			//Arbeite solange es arbeit gibt
 			while(!workFinished){

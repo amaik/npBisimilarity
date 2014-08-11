@@ -33,6 +33,7 @@ public class Main {
 		JsonObject ltsObject = Json.createReader(new StringReader(encodedLts))
 				.readObject();
 
+		@SuppressWarnings("unused")
 		String initialStateLabel = ltsObject.getString("initialState");
 
 		//System.out.println("The initial state is \"" + initialStateLabel
@@ -51,6 +52,7 @@ public class Main {
 
 				JsonObject transition = transitionsArray.getJsonObject(i);
 
+				@SuppressWarnings("unused")
 				String label = transition.getString("label");
 
 				// detailsLabel contains additional information
@@ -61,6 +63,7 @@ public class Main {
 				// However, if you are adventurous, you can keep it
 				// and add some helpful detailsLabels to the transitions in your
 				// output
+				@SuppressWarnings("unused")
 				String detailsLabel = null;
 				try {
 					detailsLabel = transition.getString("detailsLabel");
@@ -68,6 +71,7 @@ public class Main {
 					// ignore - detailsLabel = null
 				}
 
+				@SuppressWarnings("unused")
 				String target = transition.getString("target");
 
 				/*System.out.println("Saw a transition from \""
@@ -294,17 +298,19 @@ public class Main {
 			/*
 			 * Genrate new LTS in LTS-JSON-Format
 			 */
-			String minJSON = minified.generateJSONLtsString();
+			//String minJSON = minified.generateJSONLtsString();
 			/*
 			 * Print minified LTS
 			 */
+			//System.out.println(minified.toString());
 			openInBrowserDemo(minified.generateJSONLtsForm());
-//			while(true){
-//				input = readStandardInput();
-//				lts = parseAndGenerateLTS(input);
-//				openInBrowserDemo(lts.generateJSONLtsForm());
-//
-//			}
+			while(true){
+				System.out.println("..");
+				input = readStandardInput();
+				lts = parseAndGenerateLTS(input);
+				openInBrowserDemo(lts.generateJSONLtsForm());
+
+			}
 			
 		} else if (args.length == 1 && args[0].equals("-wk")) {
 			// started with command line argument -wk
@@ -329,9 +335,9 @@ public class Main {
 			Collections.sort(transList);
 
 			//System.out.println("weak Transitions: " + weakTransitions.size());
-			for (String trans : transList) {
+			//for (String trans : transList) {
 				//System.out.println(trans.toString());
-			}
+			//}
 
 		} else {
 			// other command line arguments

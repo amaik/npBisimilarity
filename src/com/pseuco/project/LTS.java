@@ -250,7 +250,7 @@ public class LTS {
 
 			/* Jeder zustand kann sich selbst aber schwach erreichen! */
 
-			if (i.isIntern()) { // man kommt zu dem Folgezustand über eine
+			if (i.isIntern() && !transTarget.equals(current)) { // man kommt zu dem Folgezustand über eine
 								// schwache Aktion (Transition? Es gibt keine
 								// schwachen Aktionen)
 				if (UsedStrong) { // falls schon starke genutzt
@@ -303,7 +303,6 @@ public class LTS {
 	
 	
 	public JsonObject generateJSONLtsForm(){
-		String result = new String();
 		
 		JsonObjectBuilder statesObjectBuilder = Json.createObjectBuilder();
 		for(State s : this.states){
