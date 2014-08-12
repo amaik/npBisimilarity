@@ -1,5 +1,6 @@
 package com.pseuco.project;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class MinimizationMonitor {
@@ -15,6 +16,8 @@ public class MinimizationMonitor {
 	
 	private  HashSet<Transition> weakTransitionRelation;
 	
+	private HashMap<State,HashMap<Action,HashSet<State>>> preMap = new HashMap<State,HashMap<Action,HashSet<State>>>() ; //given a key state it will return all predecessors for any action alpha 
+	
 	private  boolean workFinished = false;
 	
 	
@@ -26,6 +29,28 @@ public class MinimizationMonitor {
 		partition.add(startP);
 		weakTransitionRelation = weakTransRel;
 		toDoList.add(new BlockTuple(startP, startP));
+		this.createPreMap();
+	}
+	
+	private void createPreMap() {
+		for (Block block : this.partition) {
+			for (State state : block.getStates()) {
+				HashMap<Action,HashSet<State>> MapForState = new HashMap<Action,HashSet<State>>();
+				for (Transition trans : this.weakTransitionRelation) {
+					if (trans.getTarState().equals(state)) {
+						if (MapForState.get(trans.getTransAction())==null) { //wenn hashset für diese aktion noch nicht erstellt
+							HashSet<State> newSet = new HashSet<State>();
+							newSet.add(trans.getSrcState());
+							MapForState.put(trans.getTransAction(), newSet);
+						}
+						else { //set already exists
+							MapForState.get(trans.getTransAction()).add(trans.getSrcState());
+						}
+					}
+				}
+				this.preMap.put(state, MapForState);
+			}
+		}
 	}
 	
 	public  HashSet<Transition> getWeakTransitionRelation() {
@@ -47,18 +72,17 @@ public class MinimizationMonitor {
 	 * Unlocked Methodds
 	 */
 	//returns the predecessors for all states in the given block b with action alpha
-	@SuppressWarnings("unchecked")
 	public   HashSet<State> pre(Block b, Action alpha){
 		HashSet<State> res = new HashSet<State>();
 		for (State state : b.getStates()) {
-			for (Transition trans : this.weakTransitionRelation)	{
-				if (trans.getTarState().equals(state) && trans.getTransAction().equals(alpha))	{ //target state and action equal
-					res.add(trans.getSrcState()); //=> add the start-state to res
-				}
+			HashMap<Action, HashSet<State>> stateMap = this.preMap.get(state);
+			HashSet<State> statePre = stateMap.get(alpha);
+			if (statePre != null) { //could be null if theres no predecessor from the given state with this action
+				res.addAll(statePre);
 			}
 		}
-		
-		return (HashSet<State>) res.clone();
+		//return (HashSet<State>) res.clone(); //warum clone ? wirds verändert
+		return res;
 	}
 	
 	//returns all actions for the given weakTransitionRelation

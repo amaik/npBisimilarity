@@ -263,6 +263,7 @@ public class Main {
 			/*
 			 * Parse the Input LTS and Generate the Class
 			 */
+			
 			LTS lts = parseAndGenerateLTS(input);
 
 			/*
@@ -283,6 +284,7 @@ public class Main {
 
 		} 
 		else if (args.length == 1 && args[0].equals("-b")) {
+		
 			String input = readStandardInput();
 
 			/*
@@ -304,10 +306,11 @@ public class Main {
 			 */
 			//System.out.println(minified.toString());
 			openInBrowserDemo(minified.generateJSONLtsForm());
+			
 			while(true){
 				System.out.println("..");
-				input = readStandardInput();
-				lts = parseAndGenerateLTS(input);
+				 input = readStandardInput();
+				 lts = parseAndGenerateLTS(input);
 				openInBrowserDemo(lts.generateJSONLtsForm());
 
 			}
