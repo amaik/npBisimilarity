@@ -231,7 +231,7 @@ public class LTS {
 
 	// Start is the state the Transitions are computed for
 	// current is the current State in the recursive descent
-	public void generateTheREALWeakTransitions(State start, State current,
+	private void generateTheREALWeakTransitions(State start, State current,
 			Boolean UsedStrong, Action StrongAction,
 			HashSet<State> alreadyVisited, int ActionsUsed) {
 
@@ -239,7 +239,7 @@ public class LTS {
 			throw new NullPointerException("start == null");
 		}
 
-		//alreadyVisited.add(current);
+		alreadyVisited.add(current);
 
 		for (Transition i : this.getOutgoingTransitions(current)) { // iteriere
 																	// über
@@ -321,6 +321,45 @@ public class LTS {
 				.build();
 		return ltsObject;
 	}
+
+//add additional weakRelations if there are strong-self loops	
+private void BonusRound() {
+	for (State state : this.states) {
+		HashSet<Action> selfLoops = new HashSet<Action>();
+		if (hasStrongSelfLoop(state,selfLoops)) 
+		{
+			HashSet<Transition> outW = this.getOutgoingWeakTransitions(state);
+			for (Transition trans : outW) {
+				if (trans.isIntern()){
+					for (Action act : selfLoops ) {
+					Transition newTrans = new Transition(state, trans.getTarState(),act);
+					this.weakTransitionRelation.add(newTrans);
+					}
+				}
+			}
+			
+		}
+	}
+}	
+
+
+
+
+private boolean hasStrongSelfLoop(State state, HashSet<Action> selfLoops) {
+	boolean res=false;
+	HashSet<Transition> outS = this.getOutgoingTransitions(state);
+	for (Transition trans : outS) {
+		if (!trans.isIntern())
+			if (trans.getSrcState() == state)
+				if (trans.getTarState() == state)
+				{
+					selfLoops.add(trans.getTransAction());
+					res=true;
+				}
+	}
+	return res;
+	
+}
 	
 public void minimizeTransitions() {
 	
@@ -331,7 +370,7 @@ public void minimizeTransitions() {
 		this.generateTheREALWeakTransitions(i, i, false, null,alreadyVisited, 0);
 				
 	}
-	
+	this.BonusRound();	
 	HashSet<Transition> toDelete = new HashSet<Transition>();
 		for (Transition trans : this.transitionRelation){
 			for (Transition weak : this.getWeakTransitionRelation()){
