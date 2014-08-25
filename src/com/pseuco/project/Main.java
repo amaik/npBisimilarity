@@ -259,7 +259,9 @@ public class Main {
 		if (args.length == 1 && args[0].equals("-i")) {			
 			// started with command line argument -i
 			// read the input
-			String input = readStandardInput();
+			//String input = readStandardInput();
+			String input = Utf8IO.readStdin();
+
 			/*
 			 * Parse the Input LTS and Generate the Class
 			 */
@@ -350,7 +352,7 @@ public class Main {
 	}
 
 	// creates a minimised Partition, based on the given lts
-	public static HashSet<Block> minifyPartition(LTS lts)
+	public static HashSet<Block> minifyPartition(LTS lts) 
 			throws InterruptedException {
 
 		MinimizationMonitor moni = new MinimizationMonitor(lts.getStates(),
@@ -360,10 +362,15 @@ public class Main {
 		Thread[] threads = new Thread[avProc + 1];
 		for (int i = 0; i <= avProc; i++) {
 			Thread freddi = new Thread(moni.runner);
-			freddi.start();
+			freddi.start(); 
+			/*
+			 * Unser LTS ist gewollt ungeschützt, da es einmal erstellt wird und die arbeitenden Threads erst danach alle lesend darauf zugreifen.
+			 * laut http://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html : 17.4.5. Happens-before Order:
+			 * "A call to start() on a thread happens-before any actions in the started thread."
+			 * Daher wird garantiert, dass unsere Run-Methoden die gewünschten Werte aus dem Arbeitsspeicher lesen.
+			 * */
 			threads[i] = freddi;
 		}
-
 		for (int i = 0; i <= avProc; i++) {
 			Thread freddi = threads[i];
 			freddi.join();

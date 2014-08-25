@@ -99,7 +99,7 @@ public class MinimizationMonitor {
 		@SuppressWarnings({ "unchecked", "unused" })
 		public void run() {
 			//Arbeite solange es arbeit gibt
-			while(!workFinished){
+			while(!isWorkFinished()){
 				//Hohle die nächste toDos
 				BlockTuple next = null;
 				try {
@@ -267,5 +267,9 @@ public class MinimizationMonitor {
 		if(toDoList.isEmpty() && currentlyDoneList.isEmpty())
 			workFinished = true;
 		notifyAll();
+	}
+	
+	synchronized public boolean isWorkFinished() {
+		return workFinished;
 	}
 }
