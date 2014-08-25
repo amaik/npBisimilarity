@@ -239,7 +239,7 @@ public class LTS {
 			throw new NullPointerException("start == null");
 		}
 
-		alreadyVisited.add(current);
+		//alreadyVisited.add(current);
 
 		for (Transition i : this.getOutgoingTransitions(current)) { // iteriere
 																	// über
